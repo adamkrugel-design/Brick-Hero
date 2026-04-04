@@ -239,17 +239,19 @@ def:pub CountdownApp() -> JsxElement {
                             <div>
                                 <p className="text-xs uppercase tracking-wide text-muted-foreground">Detected part</p>
                                 <h3 className="mt-1 text-lg font-semibold text-foreground">{active_name}</h3>
-                                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                                    <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-                                        <p className="text-xs uppercase tracking-wide">Detected color</p>
-                                        <p className="mt-1 text-base font-semibold text-foreground">{str(active_color)}</p>
-                                        <p className="mt-1 text-xs">Source: {active_color_source}</p>
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                    <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-sm text-cyan-100">
+                                        <span className="text-[11px] font-medium uppercase tracking-wide text-cyan-200/80">Color</span>
+                                        <span className="font-semibold text-cyan-50">{str(active_color)}</span>
                                     </div>
-                                    <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-                                        <p className="text-xs uppercase tracking-wide">Years released</p>
-                                        <p className="mt-1 text-base font-semibold text-foreground">{str(active_years)}</p>
-                                        <p className="mt-1 text-xs">Source: {active_years_source}</p>
+                                    <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-sm text-violet-100">
+                                        <span className="text-[11px] font-medium uppercase tracking-wide text-violet-200/80">Years</span>
+                                        <span className="font-semibold text-violet-50">{str(active_years)}</span>
                                     </div>
+                                </div>
+                                <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                                    <p>Color source: <span className="font-medium text-foreground">{active_color_source}</span></p>
+                                    <p>Years source: <span className="font-medium text-foreground">{active_years_source}</span></p>
                                 </div>
                             </div>
                             <span className="rounded-full bg-card px-3 py-1 text-sm font-medium text-foreground">{active_confidence}</span>
@@ -265,19 +267,6 @@ def:pub CountdownApp() -> JsxElement {
                                 <p className="font-medium text-foreground">Release range</p>
                                 <p className="mt-1 text-base font-semibold text-foreground">{str(active_release_range)}</p>
                                 <p className="mt-1 text-xs">Start and end years</p>
-                            </div>
-                        </div>
-                        <div className="mt-4 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-                            <p className="font-medium text-foreground">Detected part details</p>
-                            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                                <div>
-                                    <p className="text-xs uppercase tracking-wide">BrickLink years released</p>
-                                    <p className="mt-1 text-base font-semibold text-foreground">{str(active_years)}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs uppercase tracking-wide">Detected color</p>
-                                    <p className="mt-1 text-base font-semibold text-foreground">{str(active_color)}</p>
-                                </div>
                             </div>
                         </div>
                         <div className="mt-4 rounded-2xl border border-border bg-card p-4">
