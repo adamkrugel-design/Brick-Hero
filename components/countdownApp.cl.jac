@@ -132,12 +132,12 @@ def:pub CountdownApp() -> JsxElement {
                 active_confidence = str(match_info["confidence"] or "0%");
                 active_notes = str(match_info["notes"] or "Recognition complete.");
                 active_part_id = str(match_info["part_id"] or "—");
-                active_years = str(years_info["label"] or "Unknown");
-                active_years_start = str(years_info["start"] or "");
-                active_years_end = str(years_info["end"] or "");
-                active_years_source = str(years_info["source"] or "BrickLink");
-                active_color = str(color_info["label"] or "Unknown");
-                active_color_source = str(color_info["source"] or "Brickognize");
+                active_years = str(years_info["label"] or match_info["years_released_label"] or "Unknown");
+                active_years_start = str(years_info["start"] or match_info["years_released_start"] or "");
+                active_years_end = str(years_info["end"] or match_info["years_released_end"] or "");
+                active_years_source = str(years_info["source"] or match_info["years_released_source"] or "BrickLink");
+                active_color = str(color_info["label"] or match_info["color_label"] or match_info["detected_color"] or "Unknown");
+                active_color_source = str(color_info["source"] or match_info["color_source"] or "Brickognize");
                 active_bricklink_url = str(match_info["bricklink_url"] or "");
                 provider = str(telemetry["provider"] or "Brickognize");
                 payload_text = str(telemetry["mime_type"] or "image/png") + " · " + str(telemetry["bytes"] or 0) + " bytes";
@@ -235,22 +235,22 @@ def:pub CountdownApp() -> JsxElement {
                         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Part ID</p>
-                                <p className="mt-1 text-base font-semibold text-foreground">{active_part_id}</p>
+                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_part_id)}</p>
                                 <p className="mt-1 text-xs">Catalog reference</p>
                             </div>
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Years released</p>
-                                <p className="mt-1 text-base font-semibold text-foreground">{active_years}</p>
+                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_years)}</p>
                                 <p className="mt-1 text-xs">Source: {active_years_source}</p>
                             </div>
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Release range</p>
-                                <p className="mt-1 text-base font-semibold text-foreground">{active_years_start != "" and (active_years_start + " → " + active_years_end) or "Unknown"}</p>
+                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_years_start != "" and (active_years_start + " → " + active_years_end) or "Unknown")}</p>
                                 <p className="mt-1 text-xs">Start and end years</p>
                             </div>
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Detected color</p>
-                                <p className="mt-1 text-base font-semibold text-foreground">{active_color}</p>
+                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_color)}</p>
                                 <p className="mt-1 text-xs">Source: {active_color_source}</p>
                             </div>
                         </div>
