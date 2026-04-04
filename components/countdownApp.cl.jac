@@ -16,7 +16,7 @@ def:pub CountdownApp() -> JsxElement {
     has active_years_source: str = "BrickLink";
     has active_release_range: str = "Unknown";
     has active_color: str = "Unknown";
-    has active_color_source: str = "Brickognize";
+    has active_color_source: str = "BrickLink";
     has active_bricklink_url: str = "";
     has provider: str = "Brickognize";
     has payload_text: str = "image/png · 0 bytes";
@@ -146,7 +146,7 @@ def:pub CountdownApp() -> JsxElement {
                 }
                 active_years_source = str((years_info and years_info["source"]) or (match_info and match_info["years_released_source"]) or "BrickLink");
                 active_color = str((color_info and color_info["label"]) or (match_info and match_info["color_label"]) or (match_info and match_info["detected_color"]) or "Unknown");
-                active_color_source = str((color_info and color_info["source"]) or (match_info and match_info["color_source"]) or "Brickognize");
+                active_color_source = str((color_info and color_info["source"]) or (match_info and match_info["color_source"]) or "BrickLink");
                 active_bricklink_url = str(match_info["bricklink_url"] or "");
                 provider = str(telemetry["provider"] or "Brickognize");
                 payload_text = str(telemetry["mime_type"] or "image/png") + " · " + str(telemetry["bytes"] or 0) + " bytes";

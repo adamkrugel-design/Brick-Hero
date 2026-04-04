@@ -173,41 +173,42 @@ def item_bricklink_url(item: any, part_id: str) -> str {
 }
 
 
-def item_color(item: any) -> dict {
-    for key in ["color_name", "color", "color_label"] {
-        value = safe_get(item, key, "");
-        if value {
-            return {"label": str(value), "source": "Brickognize"};
-        }
+def parse_bricklink_color(page_text: str) -> dict {
+    if not page_text {
+        return {"label": "Unknown", "source": "BrickLink"};
     }
 
-    color_info = safe_get(item, "color_info", None);
-    if type(color_info) == dict {
-        for key in ["name", "label"] {
-            value = safe_get(color_info, key, "");
-            if value {
-                return {"label": str(value), "source": "Brickognize"};
+    markers = ["Color:", "Known Color:"];
+    for marker in markers {
+        if marker not in page_text {
+            continue;
+        }
+        section = page_text.split(marker, 1)[1];
+        section = section.split("<br", 1)[0];
+        section = section.split("</td>", 1)[0];
+        section = section.replace("&nbsp;", " ");
+        cleaned = "";
+        inside_tag = False;
+        for ch in section {
+            if ch == "<" {
+                inside_tag = True;
+                continue;
+            }
+            if ch == ">" {
+                inside_tag = False;
+                continue;
+            }
+            if not inside_tag {
+                cleaned = cleaned + ch;
             }
         }
-    }
-
-    colors = safe_get(item, "colors", []);
-    if type(colors) == list and len(colors) > 0 {
-        first_color = colors[0];
-        if type(first_color) == dict {
-            for key in ["name", "label"] {
-                value = safe_get(first_color, key, "");
-                if value {
-                    return {"label": str(value), "source": "Brickognize"};
-                }
-            }
-        }
-        if first_color {
-            return {"label": str(first_color), "source": "Brickognize"};
+        cleaned = cleaned.strip();
+        if cleaned {
+            return {"label": cleaned, "source": "BrickLink"};
         }
     }
 
-    return {"label": "Unknown", "source": "Brickognize"};
+    return {"label": "Unknown", "source": "BrickLink"};
 }
 
 
@@ -271,9 +272,12 @@ def parse_years_released(page_text: str) -> dict {
 }
 
 
-def fetch_bricklink_years(part_id: str, bricklink_url: str) -> dict {
+def fetch_bricklink_metadata(part_id: str, bricklink_url: str) -> dict {
     if not bricklink_url and not part_id {
-        return {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"};
+        return {
+            "years_released": {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"},
+            "color": {"label": "Unknown", "source": "BrickLink"},
+        };
     }
 
     target_url = bricklink_url;
@@ -292,25 +296,42 @@ def fetch_bricklink_years(part_id: str, bricklink_url: str) -> dict {
         );
     } except Exception as e {
         return {
-            "label": "Unavailable",
-            "start": "",
-            "end": "",
-            "source": "BrickLink",
-            "error": "BrickLink lookup failed: " + str(e),
+            "years_released": {
+                "label": "Unavailable",
+                "start": "",
+                "end": "",
+                "source": "BrickLink",
+                "error": "BrickLink lookup failed: " + str(e),
+            },
+            "color": {
+                "label": "Unavailable",
+                "source": "BrickLink",
+                "error": "BrickLink lookup failed: " + str(e),
+            },
         };
     }
 
     if response.status_code < 200 or response.status_code >= 300 {
         return {
-            "label": "Unavailable",
-            "start": "",
-            "end": "",
-            "source": "BrickLink",
-            "error": "BrickLink returned status " + str(response.status_code),
+            "years_released": {
+                "label": "Unavailable",
+                "start": "",
+                "end": "",
+                "source": "BrickLink",
+                "error": "BrickLink returned status " + str(response.status_code),
+            },
+            "color": {
+                "label": "Unavailable",
+                "source": "BrickLink",
+                "error": "BrickLink returned status " + str(response.status_code),
+            },
         };
     }
 
-    return parse_years_released(response.text);
+    return {
+        "years_released": parse_years_released(response.text),
+        "color": parse_bricklink_color(response.text),
+    };
 }
 
 
@@ -354,7 +375,6 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
     best_notes = "Trained Brickognize classification result.";
     best_part_id = "";
     best_bricklink_url = "";
-    best_color = {"label": "Unknown", "source": "Brickognize"};
 
     if len(items) > 0 {
         first = items[0];
@@ -363,17 +383,17 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
         best_notes = item_notes(first);
         best_part_id = item_part_id(first);
         best_bricklink_url = item_bricklink_url(first, best_part_id);
-        best_color = item_color(first);
     } else {
         best_name = str(safe_get(payload, "name", "Unknown part"));
         best_confidence_value = item_confidence(payload);
         best_notes = item_notes(payload);
         best_part_id = item_part_id(payload);
         best_bricklink_url = item_bricklink_url(payload, best_part_id);
-        best_color = item_color(payload);
     }
 
-    years_released = fetch_bricklink_years(best_part_id, best_bricklink_url);
+    bricklink_metadata = fetch_bricklink_metadata(best_part_id, best_bricklink_url);
+    years_released = safe_get(bricklink_metadata, "years_released", {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"});
+    best_color = safe_get(bricklink_metadata, "color", {"label": "Unknown", "source": "BrickLink"});
 
     return {
         "success": True,
