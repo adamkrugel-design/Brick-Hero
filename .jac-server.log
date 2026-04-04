@@ -240,13 +240,36 @@ components/countdownApp.cl.jac, line 129, col 9: try statement requires at least
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
-ing '}'
-components/countdownApp.cl.jac, line 129, col 9: try statement requires at least one except or finally block
+[HMR] Reloaded: ./services/recognition.sv.jac
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+components/countdownApp.cl.jac, line 307, col 1: Missing '}'
+components/countdownApp.cl.jac, line 106, col 13: 'pass' is not supported in Jac
+components/countdownApp.cl.jac, line 176, col 13: 'pass' is not supported in Jac
+✔ Recompiled: ./main.jac -> main.js
+✖ Error: Compile error in ./main.jac:
+components/countdownApp.cl.jac, line 307, col 1: Missing '}'
+[HMR] Reloaded: ./services/recognition.sv.jac
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./services/recognition.sv.jac
 [HMR] Reloaded: ./components/countdownApp.cl.jac
-✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+services/recognition.sv.jac, line 1, col 7: Missing ';'
+services/recognition.sv.jac, line 1, col 7: Unexpected token ':'
+services/recognition.sv.jac, line 1, col 35: Unexpected token '}'
+services/recognition.sv.jac, line 2, col 7: Missing ';'
+services/recognition.sv.jac, line 2, col 7: Unexpected token ':'
+services/recognition.sv.jac, line 2, col 32: Unexpected token '}'
+[HMR] Reloaded: ./services/recognition.sv.jac
+nApp.js
+[HMR] Reloaded: ./services/recognition.sv.jac
 [HMR] Reloaded: ./components/countdownApp.cl.jac
-✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
-[HMR] Reloaded: ./components/countdownApp.cl.jac
-✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+services/recognition.sv.jac, line 1, col 7: Missing ';'
+services/recognition.sv.jac, line 1, col 7: Unexpected token ':'
+services/recognition.sv.jac, line 1, col 35: Unexpected token '}'
+services/recognition.sv.jac, line 2, col 7: Missing ';'
+services/recognition.sv.jac, line 2, col 7: Unexpected token ':'
+services/recognition.sv.jac, line 2, col 32: Unexpected token '}'
+[HMR] Reloaded: ./services/recognition.sv.jac

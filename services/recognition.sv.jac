@@ -15,7 +15,12 @@ def parse_data_url(frame_data: str) -> tuple[str, bytes] {
     if ";" in header and ":" in header {
         mime_type = header.split(":", 1)[1].split(";", 1)[0];
     }
-    return (mime_type, b64decode(parts[1]));
+    try {
+        decoded = b64decode(parts[1]);
+        return (mime_type, decoded);
+    } except Exception {
+        return (mime_type, b"");
+    }
 }
 
 
@@ -39,16 +44,20 @@ def normalize_items(payload: any) -> list {
     if payload == None {
         return [];
     }
-    if type(payload) == list {
-        return payload;
-    }
-    if type(payload) == dict {
-        for key in ["items", "predictions", "results"] {
-            value = safe_get(payload, key, []);
-            if type(value) == list {
-                return value;
+    try {
+        payload_type = type(payload);
+        if payload_type == list {
+            return payload;
+        }
+        if payload_type == dict {
+            for key in ["items", "predictions", "results"] {
+                value = safe_get(payload, key, []);
+                if type(value) == list {
+                    return value;
+                }
             }
         }
+    } except Exception {
     }
     return [];
 }
@@ -76,33 +85,10 @@ def item_confidence(item: any) -> int {
                 }
                 return int(round(numeric));
             } except Exception {
-                pass;
             }
         }
     }
     return 0;
-}
-
-
-def item_image(item: any) -> str {
-    for key in ["image", "image_url", "thumbnail", "thumbnail_url"] {
-        value = safe_get(item, key, "");
-        if value {
-            return str(value);
-        }
-    }
-    return "";
-}
-
-
-def item_external_url(item: any) -> str {
-    for key in ["url", "external_url", "bricklink_url", "brickset_url"] {
-        value = safe_get(item, key, "");
-        if value {
-            return str(value);
-        }
-    }
-    return "";
 }
 
 
@@ -114,23 +100,6 @@ def item_notes(item: any) -> str {
         }
     }
     return "Trained Brickognize classification result.";
-}
-
-
-def sort_ranked(items: list) -> list {
-    ordered = [];
-    remaining = items;
-    while len(remaining) > 0 {
-        best = remaining[0];
-        for item in remaining {
-            if item["confidence_value"] > best["confidence_value"] {
-                best = item;
-            }
-        }
-        ordered.append(best);
-        remaining = [item for item in remaining if item != best];
-    }
-    return ordered;
 }
 
 
@@ -168,59 +137,32 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
         return {"success": False, "error": "Brickognize response was not valid JSON: " + str(e)};
     }
 
-    ranked = [];
-    for item in normalize_items(payload) {
-        ranked.append({
-            "name": item_name(item),
-            "confidence_value": item_confidence(item),
-            "image": item_image(item),
-            "url": item_external_url(item),
-            "notes": item_notes(item),
-        });
-    }
+    items = normalize_items(payload);
+    best_name = "Unknown part";
+    best_confidence_value = 0;
+    best_notes = "Trained Brickognize classification result.";
 
-    if len(ranked) == 0 {
-        fallback_name = safe_get(payload, "name", "Unknown part");
-        ranked = [{
-            "name": str(fallback_name),
-            "confidence_value": item_confidence(payload),
-            "image": item_image(payload),
-            "url": item_external_url(payload),
-            "notes": item_notes(payload),
-        }];
+    if len(items) > 0 {
+        first = items[0];
+        best_name = item_name(first);
+        best_confidence_value = item_confidence(first);
+        best_notes = item_notes(first);
+    } else {
+        best_name = str(safe_get(payload, "name", "Unknown part"));
+        best_confidence_value = item_confidence(payload);
+        best_notes = item_notes(payload);
     }
-
-    ranked = sort_ranked(ranked);
-    best = ranked[0];
-    alternatives = [
-        {
-            "name": item["name"],
-            "confidence": str(item["confidence_value"]) + "%",
-            "image": item["image"],
-            "url": item["url"],
-        }
-        for item in ranked[1:4]
-    ];
 
     return {
         "success": True,
         "active_match": {
-            "name": best["name"],
-            "confidence": str(best["confidence_value"]) + "%",
-            "color": "Brickognize model",
-            "notes": best["notes"],
-            "image": best["image"],
-            "url": best["url"],
+            "name": best_name,
+            "confidence": str(best_confidence_value) + "%",
+            "notes": best_notes,
         },
-        "alt_matches": alternatives,
-        "feature_scores": [
-            {"label": "Model confidence", "value": best["confidence_value"]},
-            {"label": "API response quality", "value": len(ranked) > 0 and 100 or 0},
-            {"label": "Candidate depth", "value": min(len(ranked) * 25, 100)},
-        ],
         "telemetry": {
             "provider": "Brickognize",
-            "candidate_count": len(ranked),
+            "candidate_count": len(items),
             "mime_type": mime_type,
             "bytes": len(raw),
         },
