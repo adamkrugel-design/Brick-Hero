@@ -1,4 +1,4 @@
-"""Countdown timer — Winter 2026."""
+"""LEGO piece image recognition demo."""
 
 cl import from .components.countdownApp { CountdownApp }
 cl import ".styles.global.css";

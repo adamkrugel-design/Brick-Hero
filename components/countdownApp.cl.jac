@@ -1,373 +1,140 @@
-"""Countdown timer component — circular dot-ring style."""
-
 def:pub CountdownApp() -> JsxElement {
-    has target_year: int = 2026;
-    has target_month: int = 12;
-    has target_day: int = 31;
-    has editing: bool = False;
-    has days: int = 0;
-    has hours: int = 0;
-    has minutes: int = 0;
-    has seconds: int = 0;
-    
-    can with [target_year, target_month, target_day] entry {
-        def tick() -> None {
-            mo = str(target_month) if target_month >= 10 else "0" + str(target_month);
-            dy = str(target_day) if target_day >= 10 else "0" + str(target_day);
-            target = Date.parse(str(target_year) + "-" + mo + "-" + dy + "T00:00:00");
-            diff = target - Date.now();
-            if diff > 0 {
-                days = Math.floor(diff / 86400000);
-                hours = Math.floor((diff % 86400000) / 3600000);
-                minutes = Math.floor((diff % 3600000) / 60000);
-                seconds = Math.floor((diff % 60000) / 1000);
-            } else {
-                days = 0;
-                hours = 0;
-                minutes = 0;
-                seconds = 0;
-            }
+    has camera_on: bool = False;
+    has status: str = "Camera ready to start";
+    has permission: str = "Not requested";
+    has active_match: dict = {
+        "name": "Brick 2 x 4",
+        "confidence": "98%",
+        "color": "Bright red",
+        "notes": "Stud spacing and rectangular silhouette strongly match a classic 2 x 4 brick."
+    };
+    has alt_matches: list = [
+        {"name": "Plate 2 x 4", "confidence": "91%"},
+        {"name": "Slope 45 2 x 2", "confidence": "76%"}
+    ];
+
+    def start_camera() -> None {
+        camera_on = True;
+        permission = "Browser webcam permission required";
+        status = "Live webcam mode enabled — point a LEGO piece at the camera";
+    }
+
+    def stop_camera() -> None {
+        camera_on = False;
+        permission = "Stopped";
+        status = "Camera paused";
+    }
+
+    def capture_frame() -> None {
+        if camera_on {
+            status = "Captured current webcam frame for recognition preview";
+        } else {
+            status = "Start the webcam first";
         }
-        tick();
-        id = setInterval(tick, 1000);
-
-        def cleanup() -> None {
-            clearInterval(id);
-        }
-
-        return cleanup;
     }
 
-    circ: float = 477.52;
-    days_arc: str = str(days / 365.0 * circ) + " " + str(circ);
-    hours_arc: str = str(hours / 24.0 * circ) + " " + str(circ);
-    minutes_arc: str = str(minutes / 60.0 * circ) + " " + str(circ);
-    seconds_arc: str = str(seconds / 60.0 * circ) + " " + str(circ);
-
-    def pad2(n: int) -> str {
-        s = str(n);
-        if len(s) < 2 {
-            return "0" + s;
-        }
-        return s;
-    }
-
-    def dec_year() -> None {
-        target_year = target_year - 1;
-    }
-
-    def inc_year() -> None {
-        target_year = target_year + 1;
-    }
-
-    def dec_month() -> None {
-        target_month = target_month - 1 if target_month > 1 else 12;
-    }
-
-    def inc_month() -> None {
-        target_month = target_month + 1 if target_month < 12 else 1;
-    }
-
-    def dec_day() -> None {
-        target_day = target_day - 1 if target_day > 1 else 31;
-    }
-
-    def inc_day() -> None {
-        target_day = target_day + 1 if target_day < 31 else 1;
-    }
-
-    def start_editing() -> None {
-        editing = True;
-    }
-
-    def stop_editing() -> None {
-        editing = False;
-    }
-
-    def particle_for(pid: int) -> dict {
-        size: int = 12 + ((pid * 23) % 79);
-        left_pct: int = 3 + ((pid * 31) % 91);
-        top_pct: int = 8 + ((pid * 47) % 83);
-
-        delay_halves: int = (pid * 3) % 13;  # 0..6.0 in 0.5 steps
-        delay_s: float = delay_halves / 2.0;
-        dur_s: float = 8.0 + float((pid * 5) % 10);
-
-        opacity: float = 0.06 + float((pid * 13) % 25) / 100.0;
-        blur_px: int = 3 + ((pid * 7) % 23);
-
-        return {
-            "id": pid,
-            "size": size,
-            "left": str(left_pct) + "%",
-            "top": str(top_pct) + "%",
-            "delay": str(delay_s) + "s",
-            "dur": str(dur_s) + "s",
-            "opacity": opacity,
-            "filter": "blur(" + str(blur_px) + "px)",
-
-        };
-    }
-
-    particle_count: int = 18;
-    particles: list = [];
-    pid: int = 1;
-    while pid <= particle_count {
-        particles.append(particle_for(pid));
-        pid += 1;
-    }
-
-    return
-        <div
-            className="cd-app relative w-screen h-screen flex flex-col overflow-hidden"
-        >
-            <div className="cd-bokeh absolute inset-0 pointer-events-none z-0">
-                {[
-                    <div
-                        key={p["id"]}
-                        className="cd-particle absolute rounded-full"
-                        style={{
-                            "width": p["size"],
-                            "height": p["size"],
-                            "left": p["left"],
-                            "top": p["top"],
-                            "opacity": p["opacity"],
-                            "filter": p["filter"],
-                            "animationDelay": p["delay"],
-                            "animationDuration": p["dur"],
-
-                        }}
-                    /> for p in particles
-                ]}
-            </div>
-            <div
-                className="cd-content relative z-10 flex flex-col items-center justify-center flex-1 gap-9"
-            >
-                <div className="cd-title-row flex items-center gap-3.5">
-                    <h1 className="cd-title">
-                        COUNTDOWN TIMER
-                    </h1>
+    return <main className="min-h-screen bg-background px-4 py-10 text-foreground sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+            <section className="rounded-[2rem] border border-border bg-card p-8 shadow-card sm:p-10">
+                <div className="inline-flex items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-semibold text-red-600">
+                    <span>🧱</span>
+                    LEGO Vision Finder
                 </div>
-                {editing
-                and <div className="cd-editor flex flex-col items-center">
-                    <div className="cd-editor-label">
-                        TARGET DATE
+                <h1 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">Live webcam LEGO recognition</h1>
+                <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">No uploads. This flow is designed for a live webcam feed so you can hold a piece in front of the camera and classify it in real time.</p>
+
+                <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                    <div className="rounded-2xl bg-red-50 p-4">
+                        <p className="text-3xl font-extrabold text-red-600">Live</p>
+                        <p className="mt-1 text-sm text-slate-600">Webcam-first capture mode</p>
                     </div>
-                    <div className="cd-editor-fields flex items-end gap-[10px]">
-                        <div className="cd-field flex flex-col items-center gap-2">
-                            <span className="cd-field-label">
-                                YEAR
-                            </span>
-                            <div
-                                className="cd-stepper flex items-center overflow-hidden"
-                            >
-                                <button className="cd-step-btn" onClick={dec_year}>
-                                    −
-                                </button>
-                                <span className="cd-step-val">
-                                    {target_year}
-                                </span>
-                                <button className="cd-step-btn" onClick={inc_year}>
-                                    +
-                                </button>
-                            </div>
-                        </div>
-                        <div className="cd-field-sep">
-                            /
-                        </div>
-                        <div className="cd-field flex flex-col items-center gap-2">
-                            <span className="cd-field-label">
-                                MONTH
-                            </span>
-                            <div
-                                className="cd-stepper flex items-center overflow-hidden"
-                            >
-                                <button className="cd-step-btn" onClick={dec_month}>
-                                    −
-                                </button>
-                                <span className="cd-step-val">
-                                    {pad2(target_month)}
-                                </span>
-                                <button className="cd-step-btn" onClick={inc_month}>
-                                    +
-                                </button>
-                            </div>
-                        </div>
-                        <div className="cd-field-sep">
-                            /
-                        </div>
-                        <div className="cd-field flex flex-col items-center gap-2">
-                            <span className="cd-field-label">
-                                DAY
-                            </span>
-                            <div
-                                className="cd-stepper flex items-center overflow-hidden"
-                            >
-                                <button className="cd-step-btn" onClick={dec_day}>
-                                    −
-                                </button>
-                                <span className="cd-step-val">
-                                    {pad2(target_day)}
-                                </span>
-                                <button className="cd-step-btn" onClick={inc_day}>
-                                    +
-                                </button>
-                            </div>
-                        </div>
+                    <div className="rounded-2xl bg-amber-50 p-4">
+                        <p className="text-3xl font-extrabold text-amber-600">Top-3</p>
+                        <p className="mt-1 text-sm text-slate-600">Instant candidate ranking</p>
                     </div>
-                    <button className="cd-done-btn" onClick={stop_editing}>
-                        DONE
-                    </button>
-                </div>}
-                <div className="cd-timer-block">
-                    <div className="cd-rings-row flex items-start gap-9">
-                        <div className="cd-ring-item flex flex-col items-center gap-3.5">
-                            <div className="cd-ring-wrap relative w-[180px] h-[180px]">
-                                <svg viewBox="0 0 180 180" width="180" height="180">
-                                    <circle
-                                        cx="90"
-                                        cy="90"
-                                        r="76"
-                                        fill="none"
-                                        stroke="rgba(0,180,220,0.15)"
-                                        strokeWidth="6"
-                                    />
-                                    <circle
-                                        cx="90"
-                                        cy="90"
-                                        r="76"
-                                        fill="none"
-                                        stroke="#00aaff"
-                                        strokeWidth="6"
-                                        strokeLinecap="round"
-                                        strokeDasharray={days_arc}
-                                        transform="rotate(-90 90 90)"
-                                    />
-                                </svg>
-                                <span
-                                    className="cd-ring-num absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                                >
-                                    {days}
-                                </span>
-                            </div>
-                            <span className="cd-ring-label">
-                                DAYS
-                            </span>
-                        </div>
-                        <div className="cd-ring-item flex flex-col items-center gap-3.5">
-                            <div className="cd-ring-wrap relative w-[180px] h-[180px]">
-                                <svg viewBox="0 0 180 180" width="180" height="180">
-                                    <circle
-                                        cx="90"
-                                        cy="90"
-                                        r="76"
-                                        fill="none"
-                                        stroke="rgba(0,180,220,0.15)"
-                                        strokeWidth="6"
-                                    />
-                                    <circle
-                                        cx="90"
-                                        cy="90"
-                                        r="76"
-                                        fill="none"
-                                        stroke="#00aaff"
-                                        strokeWidth="6"
-                                        strokeLinecap="round"
-                                        strokeDasharray={hours_arc}
-                                        transform="rotate(-90 90 90)"
-                                    />
-                                </svg>
-                                <span
-                                    className="cd-ring-num absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                                >
-                                    {hours}
-                                </span>
-                            </div>
-                            <span className="cd-ring-label">
-                                HOURS
-                            </span>
-                        </div>
-                        <div className="cd-ring-item flex flex-col items-center gap-3.5">
-                            <div className="cd-ring-wrap relative w-[180px] h-[180px]">
-                                <svg viewBox="0 0 180 180" width="180" height="180">
-                                    <circle
-                                        cx="90"
-                                        cy="90"
-                                        r="76"
-                                        fill="none"
-                                        stroke="rgba(0,180,220,0.15)"
-                                        strokeWidth="6"
-                                    />
-                                    <circle
-                                        cx="90"
-                                        cy="90"
-                                        r="76"
-                                        fill="none"
-                                        stroke="#00aaff"
-                                        strokeWidth="6"
-                                        strokeLinecap="round"
-                                        strokeDasharray={minutes_arc}
-                                        transform="rotate(-90 90 90)"
-                                    />
-                                </svg>
-                                <span
-                                    className="cd-ring-num absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                                >
-                                    {minutes}
-                                </span>
-                            </div>
-                            <span className="cd-ring-label">
-                                MINUTES
-                            </span>
-                        </div>
-                        <div
-                            className="cd-ring-item flex flex-col items-center gap-3.5"
-                        >
-                            <div className="cd-ring-wrap relative w-[180px] h-[180px]">
-                                <svg viewBox="0 0 180 180" width="180" height="180">
-                                    <circle
-                                        cx="90"
-                                        cy="90"
-                                        r="76"
-                                        fill="none"
-                                        stroke="rgba(0,180,220,0.15)"
-                                        strokeWidth="6"
-                                    />
-                                    <circle
-                                        cx="90"
-                                        cy="90"
-                                        r="76"
-                                        fill="none"
-                                        stroke="#00aaff"
-                                        strokeWidth="6"
-                                        strokeLinecap="round"
-                                        strokeDasharray={seconds_arc}
-                                        transform="rotate(-90 90 90)"
-                                    />
-                                </svg>
-                                <span
-                                    className="cd-ring-num absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                                >
-                                    {seconds}
-                                </span>
-                            </div>
-                            <span className="cd-ring-label">
-                                SECONDS
-                            </span>
-                        </div>
-                    </div>
-                    <div
-                        className="btn-wrapper flex justify-center items-center h-[120px]"
-                    >
-                        <button
-                            className="cd-change-btn"
-                            type="button"
-                            onClick={start_editing}
-                        >
-                            Change timer
-                        </button>
+                    <div className="rounded-2xl bg-blue-50 p-4">
+                        <p className="text-3xl font-extrabold text-blue-600">Frame</p>
+                        <p className="mt-1 text-sm text-slate-600">Analyze the current camera view</p>
                     </div>
                 </div>
-            </div>
-        </div>;
+
+                <div className="mt-8 rounded-[1.5rem] border border-border bg-background p-6">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Live input</p>
+                            <h2 className="mt-1 text-2xl font-bold">Webcam feed</h2>
+                        </div>
+                        <span className="rounded-full bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">{permission}</span>
+                    </div>
+
+                    <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-border bg-slate-950">
+                        <div className="relative flex min-h-80 items-center justify-center px-6 py-8 text-center text-white">
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(239,68,68,0.18),transparent_45%),linear-gradient(180deg,rgba(15,23,42,0.92),rgba(2,6,23,1))]"></div>
+                            <div className="absolute inset-6 rounded-[1.25rem] border-2 border-dashed border-white/35"></div>
+                            <div className="relative z-10 max-w-md">
+                                <div className="mx-auto flex h-18 w-18 items-center justify-center rounded-full bg-white/10 text-4xl">📷</div>
+                                <p className="mt-4 text-xl font-bold">{camera_on and "Camera stream active" or "Camera preview placeholder"}</p>
+                                <p className="mt-2 text-sm leading-6 text-slate-200">{camera_on and "Your live webcam feed will appear here once browser camera access is wired in." or "This panel is now reserved for the live webcam stream instead of file upload."}</p>
+                                <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs font-semibold text-slate-200">
+                                    <span className="rounded-full bg-white/10 px-3 py-1">Stud count</span>
+                                    <span className="rounded-full bg-white/10 px-3 py-1">Silhouette</span>
+                                    <span className="rounded-full bg-white/10 px-3 py-1">Color family</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap gap-3">
+                        <button className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition hover:opacity-90" onClick={start_camera}>Start webcam</button>
+                        <button className="inline-flex items-center justify-center rounded-xl border border-border bg-white px-5 py-3 text-sm font-bold text-foreground transition hover:bg-slate-50" onClick={capture_frame}>Analyze current frame</button>
+                        <button className="inline-flex items-center justify-center rounded-xl border border-border bg-white px-5 py-3 text-sm font-bold text-foreground transition hover:bg-slate-50" onClick={stop_camera}>Stop webcam</button>
+                    </div>
+
+                    <div className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                        <span className="font-semibold">Status:</span> {status}
+                    </div>
+                </div>
+            </section>
+
+            <section className="flex flex-col gap-6">
+                <div className="rounded-[2rem] border border-border bg-card p-6 shadow-soft">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Recognition results</p>
+                    <h2 className="mt-2 text-2xl font-extrabold">Top likely matches</h2>
+                    <div className="mt-5 space-y-4">
+                        <div className="rounded-[1.25rem] border border-border bg-card p-4 shadow-soft">
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Live best match</p>
+                                    <h3 className="text-lg font-bold">{active_match["name"]}</h3>
+                                </div>
+                                <span className="inline-flex rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white">{active_match["confidence"]}</span>
+                            </div>
+                            <p className="mt-3 text-sm text-slate-600"><span className="font-semibold text-foreground">Colorway:</span> {active_match["color"]}</p>
+                            <p className="mt-2 text-sm text-slate-600">{active_match["notes"]}</p>
+                        </div>
+                        {[<div key={item["name"]} className="rounded-[1.25rem] border border-border bg-card p-4 shadow-soft">
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Alternative</p>
+                                    <h3 className="text-lg font-bold">{item["name"]}</h3>
+                                </div>
+                                <span className="inline-flex rounded-full bg-slate-700 px-3 py-1 text-xs font-bold text-white">{item["confidence"]}</span>
+                            </div>
+                        </div> for item in alt_matches]}
+                    </div>
+                </div>
+
+                <div className="rounded-[2rem] border border-border bg-card p-6 shadow-soft">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Webcam pipeline</p>
+                    <h2 className="mt-2 text-2xl font-extrabold">How this should work</h2>
+                    <div className="mt-5 space-y-4 text-sm leading-6 text-slate-600">
+                        <p>1. Request browser camera access with <span className="font-semibold text-foreground">getUserMedia()</span>.</p>
+                        <p>2. Render the live stream into a video element in this panel.</p>
+                        <p>3. Grab frames on demand or on an interval for LEGO part recognition.</p>
+                        <p>4. Send frame embeddings into a Jac graph to match parts, alternates, and set inventory context.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>;
 }
