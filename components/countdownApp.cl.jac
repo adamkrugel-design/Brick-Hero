@@ -1,9 +1,6 @@
 sv import from ..services.recognition { recognize_lego_frame }
-import from "@jac/runtime" { useRef }
-
 
 def:pub CountdownApp() -> JsxElement {
-    has camera_on: bool = False;
     has analyzing: bool = False;
     has status: str = "Camera ready to start";
     has permission: str = "Not requested";
@@ -12,12 +9,8 @@ def:pub CountdownApp() -> JsxElement {
     has active_confidence: str = "0%";
     has active_notes: str = "Start the webcam and capture a frame to run Brickognize classification.";
     has provider: str = "Brickognize";
-    has payload_text: str = "image/jpeg · 0 bytes";
+    has payload_text: str = "image/png · 0 bytes";
     has candidate_text: str = "0 ranked matches returned from Brickognize";
-
-    video_ref = useRef(None);
-    canvas_ref = useRef(None);
-    stream_ref = useRef(None);
 
     async def start_camera() -> None {
         try {
@@ -27,38 +20,34 @@ def:pub CountdownApp() -> JsxElement {
                 status = "This browser does not expose mediaDevices";
                 return;
             }
+            video = web.document.getElementById("scanner-video");
             stream = await media_devices.getUserMedia({"video": True, "audio": False});
-            stream_ref.current = stream;
-            if video_ref.current {
-                video_ref.current.srcObject = stream;
-                await video_ref.current.play();
+            if video {
+                video.srcObject = stream;
+                await video.play();
             }
+            web.window.__legoScannerStream = stream;
             permission = "Granted";
-            camera_on = True;
             status = "Live webcam stream active — hold a LEGO piece in frame";
         } except Exception as e {
             permission = "Denied";
-            camera_on = False;
             status = "Unable to start webcam: " + str(e);
         }
     }
 
     def stop_camera() -> None {
-        try {
-            stream = stream_ref.current;
-            if stream {
-                tracks = stream.getTracks();
-                for track in tracks {
-                    track.stop();
-                }
+        stream = web.window.__legoScannerStream;
+        if stream {
+            tracks = stream.getTracks();
+            for track in tracks {
+                track.stop();
             }
-        } except Exception {
         }
-        if video_ref.current {
-            video_ref.current.srcObject = None;
+        video = web.document.getElementById("scanner-video");
+        if video {
+            video.srcObject = None;
         }
-        stream_ref.current = None;
-        camera_on = False;
+        web.window.__legoScannerStream = None;
         permission = "Stopped";
         status = "Camera paused";
     }
@@ -69,16 +58,14 @@ def:pub CountdownApp() -> JsxElement {
         try {
             result = await recognize_lego_frame(frame_data);
             if result and result["success"] {
-                if result["active_match"] {
-                    active_name = str(result["active_match"]["name"] or active_name);
-                    active_confidence = str(result["active_match"]["confidence"] or active_confidence);
-                    active_notes = str(result["active_match"]["notes"] or active_notes);
-                }
-                if result["telemetry"] {
-                    provider = str(result["telemetry"]["provider"] or provider);
-                    payload_text = str(result["telemetry"]["mime_type"] or "image/png") + " · " + str(result["telemetry"]["bytes"] or 0) + " bytes";
-                    candidate_text = str(result["telemetry"]["candidate_count"] or 0) + " ranked matches returned from Brickognize";
-                }
+                match_info = result["active_match"] or {};
+                telemetry = result["telemetry"] or {};
+                active_name = str(match_info["name"] or "Unknown part");
+                active_confidence = str(match_info["confidence"] or "0%");
+                active_notes = str(match_info["notes"] or "Trained Brickognize classification result.");
+                provider = str(telemetry["provider"] or "Brickognize");
+                payload_text = str(telemetry["mime_type"] or "image/png") + " · " + str(telemetry["bytes"] or 0) + " bytes";
+                candidate_text = str(telemetry["candidate_count"] or 0) + " ranked matches returned from Brickognize";
                 status = "Brickognize classification complete — live snapshot analyzed";
             } else {
                 status = str((result and result["error"]) or "Recognition failed");
@@ -90,20 +77,20 @@ def:pub CountdownApp() -> JsxElement {
     }
 
     async def capture_frame() -> None {
-        if not camera_on {
-            status = "Start the webcam first";
-            return;
-        }
         if analyzing {
             status = "Recognition already in progress";
             return;
         }
-        if not video_ref.current or not canvas_ref.current {
+        video = web.document.getElementById("scanner-video");
+        canvas = web.document.getElementById("scanner-canvas");
+        if not video or not canvas {
             status = "Camera surface not ready";
             return;
         }
-        video = video_ref.current;
-        canvas = canvas_ref.current;
+        if not video.srcObject {
+            status = "Start the webcam first";
+            return;
+        }
         width = int(video.videoWidth or 640);
         height = int(video.videoHeight or 480);
         canvas.width = width;
@@ -117,19 +104,6 @@ def:pub CountdownApp() -> JsxElement {
         frame_data = canvas.toDataURL("image/png");
         captured_frame = frame_data;
         await analyze_frame(frame_data);
-    }
-
-    can with exit {
-        try {
-            stream = stream_ref.current;
-            if stream {
-                tracks = stream.getTracks();
-                for track in tracks {
-                    track.stop();
-                }
-            }
-        } except Exception {
-        }
     }
 
     return (
@@ -158,8 +132,8 @@ def:pub CountdownApp() -> JsxElement {
                     <div className="mt-5 overflow-hidden rounded-[1.6rem] border-2 border-cyan-300/35 bg-slate-950 shadow-[0_0_0_2px_rgba(0,229,255,0.08)]">
                         <div className="relative min-h-80 bg-black">
                             <div className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0)),repeating-linear-gradient(180deg,rgba(0,229,255,0.08)_0px,rgba(0,229,255,0.08)_1px,transparent_2px,transparent_6px)]"></div>
-                            <video ref={video_ref} className="relative z-0 h-full min-h-80 w-full object-cover" autoPlay={True} muted={True} playsInline={True}></video>
-                            {(not camera_on) and (
+                            <video id="scanner-video" className="relative z-0 h-full min-h-80 w-full object-cover" autoPlay={True} muted={True} playsInline={True}></video>
+                            {(permission != "Granted") and (
                                 <div className="absolute inset-0 flex items-center justify-center px-6 py-8 text-center text-white">
                                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.18),transparent_45%),linear-gradient(180deg,rgba(8,17,31,0.88),rgba(2,6,23,1))]"></div>
                                     <div className="absolute inset-5 rounded-[1.25rem] border-2 border-dashed border-cyan-300/35"></div>
@@ -173,7 +147,7 @@ def:pub CountdownApp() -> JsxElement {
                         </div>
                     </div>
 
-                    <canvas ref={canvas_ref} className="hidden"></canvas>
+                    <canvas id="scanner-canvas" className="hidden"></canvas>
 
                     <div className="mt-5 flex flex-wrap gap-3">
                         <button className="retro-display inline-flex items-center justify-center rounded-xl border border-cyan-300/40 bg-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 transition hover:brightness-110" onClick={start_camera}>Start webcam</button>
