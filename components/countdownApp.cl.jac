@@ -1,22 +1,23 @@
+sv import from ..services.recognition { recognize_lego_frame }
+
 def:pub CountdownApp() -> JsxElement {
     has camera_on: bool = False;
+    has analyzing: bool = False;
     has status: str = "Camera ready to start";
     has permission: str = "Not requested";
     has captured_frame: str = "";
+    has telemetry: dict = {"width": 0, "height": 0, "avg_red": 0, "avg_green": 0, "avg_blue": 0, "ratio": 0.0};
     has active_match: dict = {
-        "name": "Brick 2 x 4",
-        "confidence": "98%",
-        "color": "Bright red",
-        "notes": "Stud spacing and rectangular silhouette strongly match a classic 2 x 4 brick."
+        "name": "Waiting for live analysis",
+        "confidence": "0%",
+        "color": "Unknown",
+        "notes": "Start the webcam and capture a frame to run operational LEGO recognition."
     };
-    has alt_matches: list = [
-        {"name": "Plate 2 x 4", "confidence": "91%"},
-        {"name": "Slope 45 2 x 2", "confidence": "76%"}
-    ];
+    has alt_matches: list = [];
     has feature_scores: list = [
-        {"label": "Rectangular silhouette", "value": 96},
-        {"label": "Stud spacing", "value": 93},
-        {"label": "Color family", "value": 88}
+        {"label": "Shape similarity", "value": 0},
+        {"label": "Color similarity", "value": 0},
+        {"label": "Stud / surface confidence", "value": 0}
     ];
 
     def get_video() -> any {
@@ -77,68 +78,33 @@ def:pub CountdownApp() -> JsxElement {
         status = "Camera paused";
     }
 
-    def classify_frame(data_url: str) -> None {
-        lower_data = data_url.lower();
-        if "" == lower_data {
-            status = "No frame captured yet";
-            return;
+    async def analyze_frame(frame_data: str) -> None {
+        analyzing = True;
+        status = "Running operational recognition on the captured frame...";
+        try {
+            result = await recognize_lego_frame(frame_data);
+            if result and result["success"] {
+                active_match = result["active_match"] or active_match;
+                alt_matches = result["alt_matches"] or [];
+                feature_scores = result["feature_scores"] or feature_scores;
+                telemetry = result["telemetry"] or telemetry;
+                status = "Operational recognition complete — results updated from backend analysis";
+            } else {
+                status = "Recognition failed: " + ((result and result["error"]) or "Unknown error");
+            }
+        } except Exception as e {
+            status = "Recognition failed: " + str(e);
         }
-
-        if "red" in lower_data or "ff0000" in lower_data or "ef4444" in lower_data {
-            active_match = {
-                "name": "Brick 2 x 4",
-                "confidence": "98%",
-                "color": "Bright red",
-                "notes": "Detected a strong red color signature with a classic rectangular brick silhouette."
-            };
-            alt_matches = [
-                {"name": "Plate 2 x 4", "confidence": "91%"},
-                {"name": "Tile 2 x 4", "confidence": "84%"}
-            ];
-            feature_scores = [
-                {"label": "Rectangular silhouette", "value": 96},
-                {"label": "Stud spacing", "value": 93},
-                {"label": "Red color family", "value": 95}
-            ];
-        } elif "blue" in lower_data or "0000ff" in lower_data or "2563eb" in lower_data {
-            active_match = {
-                "name": "Plate 2 x 3",
-                "confidence": "92%",
-                "color": "Bright blue",
-                "notes": "Blue-dominant frame with a flatter profile suggests a plate rather than a full-height brick."
-            };
-            alt_matches = [
-                {"name": "Brick 1 x 3", "confidence": "81%"},
-                {"name": "Tile 2 x 3", "confidence": "77%"}
-            ];
-            feature_scores = [
-                {"label": "Flat profile", "value": 90},
-                {"label": "Edge geometry", "value": 82},
-                {"label": "Blue color family", "value": 94}
-            ];
-        } else {
-            active_match = {
-                "name": "Slope 45 2 x 2",
-                "confidence": "86%",
-                "color": "Mixed / unknown",
-                "notes": "The frame was captured successfully. Shape cues are present, but color confidence is lower, so this is a best-effort live match."
-            };
-            alt_matches = [
-                {"name": "Brick 2 x 2", "confidence": "79%"},
-                {"name": "Plate 2 x 2", "confidence": "74%"}
-            ];
-            feature_scores = [
-                {"label": "Shape edges", "value": 84},
-                {"label": "Stud visibility", "value": 76},
-                {"label": "Color family", "value": 61}
-            ];
-        }
-        status = "Frame captured and analyzed from the live webcam feed";
+        analyzing = False;
     }
 
-    def capture_frame() -> None {
+    async def capture_frame() -> None {
         if not camera_on {
             status = "Start the webcam first";
+            return;
+        }
+        if analyzing {
+            status = "Recognition already in progress";
             return;
         }
         video = get_video();
@@ -159,7 +125,7 @@ def:pub CountdownApp() -> JsxElement {
         context.drawImage(video, 0, 0, width, height);
         frame_data = canvas.toDataURL("image/jpeg", 0.92);
         captured_frame = frame_data;
-        classify_frame(frame_data);
+        await analyze_frame(frame_data);
     }
 
     can with exit {
@@ -174,7 +140,7 @@ def:pub CountdownApp() -> JsxElement {
                     LEGO Vision Finder
                 </div>
                 <h1 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">Live webcam LEGO recognition</h1>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">Point a LEGO piece at your webcam, capture the current frame, and run a live in-browser recognition pass with instant part suggestions.</p>
+                <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">Point a LEGO piece at your webcam, capture the current frame, and run a live backend recognition pass with instant part suggestions.</p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-3">
                     <div className="rounded-2xl bg-red-50 p-4">
@@ -186,8 +152,8 @@ def:pub CountdownApp() -> JsxElement {
                         <p className="mt-1 text-sm text-slate-600">Grab the current frame on demand</p>
                     </div>
                     <div className="rounded-2xl bg-blue-50 p-4">
-                        <p className="text-3xl font-extrabold text-blue-600">Recognize</p>
-                        <p className="mt-1 text-sm text-slate-600">Instant heuristic part matching</p>
+                        <p className="text-3xl font-extrabold text-blue-600">Analyze</p>
+                        <p className="mt-1 text-sm text-slate-600">Operational backend recognition</p>
                     </div>
                 </div>
 
@@ -219,7 +185,7 @@ def:pub CountdownApp() -> JsxElement {
 
                     <div className="mt-5 flex flex-wrap gap-3">
                         <button className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition hover:opacity-90" onClick={start_camera}>Start webcam</button>
-                        <button className="inline-flex items-center justify-center rounded-xl border border-border bg-white px-5 py-3 text-sm font-bold text-foreground transition hover:bg-slate-50" onClick={capture_frame}>Capture + recognize</button>
+                        <button className="inline-flex items-center justify-center rounded-xl border border-border bg-white px-5 py-3 text-sm font-bold text-foreground transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60" onClick={capture_frame} disabled={analyzing}>{analyzing and "Analyzing..." or "Capture + recognize"}</button>
                         <button className="inline-flex items-center justify-center rounded-xl border border-border bg-white px-5 py-3 text-sm font-bold text-foreground transition hover:bg-slate-50" onClick={stop_camera}>Stop webcam</button>
                     </div>
 
@@ -261,7 +227,18 @@ def:pub CountdownApp() -> JsxElement {
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Captured frame</p>
                     <h2 className="mt-2 text-2xl font-extrabold">Latest snapshot</h2>
                     <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-border bg-slate-100">
-                        {(captured_frame != "") and (<img src={captured_frame} alt="Captured LEGO frame" className="h-64 w-full object-cover" />) or (<div className="flex h-64 items-center justify-center px-6 text-center text-sm text-slate-500">Capture a frame from the live webcam feed to preview the exact image used for recognition.</div>)}
+                        {captured_frame != "" and <img src={captured_frame} alt="Captured LEGO frame" className="h-64 w-full object-cover" />}
+                        {captured_frame == "" and <div className="flex h-64 items-center justify-center px-6 text-center text-sm text-slate-500">Capture a frame from the live webcam feed to preview the exact image used for recognition.</div>}
+                    </div>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
+                            <p className="font-semibold text-foreground">Frame size</p>
+                            <p className="mt-1">{str(telemetry["width"])} × {str(telemetry["height"])} px</p>
+                        </div>
+                        <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
+                            <p className="font-semibold text-foreground">Average RGB</p>
+                            <p className="mt-1">{str(telemetry["avg_red"])} / {str(telemetry["avg_green"])} / {str(telemetry["avg_blue"])} · ratio {str(round(telemetry["ratio"], 2))}</p>
+                        </div>
                     </div>
                 </div>
 

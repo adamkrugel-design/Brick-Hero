@@ -1,4 +1,4 @@
-"""LEGO piece image recognition demo."""
+import from services.recognition { recognize_lego_frame }
 
 cl import from .components.countdownApp { CountdownApp }
 cl import ".styles.global.css";
