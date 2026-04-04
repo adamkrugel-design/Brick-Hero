@@ -87,11 +87,10 @@ services/recogniti✖ Error: Import error in ./services/recognition.sv.jac: No b
 [HMR] Reloaded: ./services/recognition.sv.jac
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
-ac, line 159, col 14: Missing ';'
-services/recognition.sv.jac, line 159, col 23: Missing ';'
-services/recognition.sv.jac, line 159, col 23: Unexpected token in expression: ','
-services/recognition.sv.jac, line 159, col 25: Missing ';'
+✖ Error: Import error in ./services/recognition.sv.jac: No bytecode found for /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/services/recognition.sv.jac
+cognition.sv.jac, line 159, col 25: Missing ';'
 ✖ Error: Import error in ./services/recognition.sv.jac: No bytecode found for /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/services/recognition.sv.jac
 [HMR] Reloaded: ./services/recognition.sv.jac
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+✖ Error: Import error in ./services/recognition.sv.jac: No bytecode found for /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/services/recognition.sv.jac
