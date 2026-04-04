@@ -1,4 +1,5 @@
 sv import from ..services.recognition { recognize_lego_frame }
+sv import from ..services.recognition { recognize_lego_frame }
 
 
 def:pub CountdownApp() -> JsxElement {
