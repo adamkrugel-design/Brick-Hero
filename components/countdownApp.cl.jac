@@ -192,19 +192,19 @@ def:pub CountdownApp() -> JsxElement {
     }
 
     return (
-        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <section className="rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8">
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 lg:grid-cols-[1.2fr_0.8fr]">
+            <section className="rounded-3xl border border-border/90 bg-card/95 p-6 shadow-card backdrop-blur sm:p-8">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <p className="text-sm font-medium text-muted-foreground">LEGO recognition</p>
-                        <h1 className="mt-1 text-3xl font-semibold text-foreground sm:text-4xl">Minimal scanner</h1>
+                        <p className="text-sm font-medium tracking-wide text-sky-200">LEGO recognition</p>
+                        <h1 className="mt-1 text-3xl font-semibold text-white sm:text-4xl">Minimal scanner</h1>
                     </div>
-                    <div className="rounded-full border border-border bg-muted px-3 py-1 text-sm text-muted-foreground">{permission}</div>
+                    <div className="rounded-full border border-slate-600 bg-slate-900/80 px-3 py-1 text-sm font-medium text-slate-100">{permission}</div>
                 </div>
 
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition. After the piece is identified, BrickLink is used to look up the color and release-year details.</p>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition. After the piece is identified, BrickLink is used to look up the color and release-year details.</p>
 
-                <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-black">
+                <div className="mt-6 overflow-hidden rounded-2xl border border-slate-700 bg-black shadow-inner shadow-black/30">
                     <div className="relative min-h-80 bg-neutral-950">
                         <video id="scanner-video" className="h-full min-h-80 w-full object-cover" autoPlay={True} muted={True} playsInline={True}></video>
                         {not camera_active and (<div className="absolute inset-0 flex items-center justify-center bg-black/60 px-6 text-center text-sm text-white/80">
@@ -216,25 +216,25 @@ def:pub CountdownApp() -> JsxElement {
                 <canvas id="scanner-canvas" className="hidden"></canvas>
 
                 <div className="mt-5 flex flex-wrap gap-3">
-                    <button className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30" onClick={start_camera}>Start webcam</button>
-                    <button className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-card-hover focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60" onClick={capture_frame} disabled={analyzing or (not camera_active)}>{analyzing and "Analyzing..." or "Capture snapshot"}</button>
-                    <button className="rounded-xl border border-border bg-muted px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary/20" onClick={stop_camera}>Stop webcam</button>
+                    <button className="rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-300/40" onClick={start_camera}>Start webcam</button>
+                    <button className="rounded-xl border border-slate-600 bg-slate-900/80 px-4 py-2.5 text-sm font-medium text-slate-100 transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-300/30 disabled:cursor-not-allowed disabled:opacity-60" onClick={capture_frame} disabled={analyzing or (not camera_active)}>{analyzing and "Analyzing..." or "Capture snapshot"}</button>
+                    <button className="rounded-xl border border-slate-600 bg-slate-950/80 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-300/30" onClick={stop_camera}>Stop webcam</button>
                 </div>
 
-                <div className="mt-4 rounded-2xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
-                    <span className="mr-2 font-medium text-foreground">Status:</span>{status}
+                <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-sm text-slate-300">
+                    <span className="mr-2 font-semibold text-white">Status:</span>{status}
                 </div>
             </section>
 
             <section className="flex flex-col gap-6">
-                <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-                    <p className="text-sm font-medium text-muted-foreground">Result</p>
-                    <h2 className="mt-1 text-2xl font-semibold text-foreground">Top match</h2>
-                    <div className="mt-4 rounded-2xl border border-border bg-muted p-4">
+                <div className="rounded-3xl border border-border/90 bg-card/95 p-6 shadow-soft backdrop-blur">
+                    <p className="text-sm font-medium tracking-wide text-sky-200">Result</p>
+                    <h2 className="mt-1 text-2xl font-semibold text-white">Top match</h2>
+                    <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
                         <div className="flex items-start justify-between gap-3">
                             <div>
-                                <p className="text-xs uppercase tracking-wide text-muted-foreground">Detected part</p>
-                                <h3 className="mt-1 text-lg font-semibold text-foreground">{active_name}</h3>
+                                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Detected part</p>
+                                <h3 className="mt-1 text-lg font-semibold text-white">{active_name}</h3>
                                 <div className="mt-3 flex flex-wrap gap-2">
                                     <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-sm text-cyan-100">
                                         <span className="text-[11px] font-medium uppercase tracking-wide text-cyan-200/80">Color</span>
@@ -245,71 +245,71 @@ def:pub CountdownApp() -> JsxElement {
                                         <span className="font-semibold text-violet-50">{str(active_years)}</span>
                                     </div>
                                 </div>
-                                <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">
-                                    <p>Color source: <span className="font-medium text-foreground">{active_color_source}</span></p>
-                                    <p>Years source: <span className="font-medium text-foreground">{active_years_source}</span></p>
+                                <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-400">
+                                    <p>Color source: <span className="font-medium text-slate-100">{active_color_source}</span></p>
+                                    <p>Years source: <span className="font-medium text-slate-100">{active_years_source}</span></p>
                                 </div>
                             </div>
-                            <span className="rounded-full bg-card px-3 py-1 text-sm font-medium text-foreground">{active_confidence}</span>
+                            <span className="rounded-full border border-slate-600 bg-slate-900/90 px-3 py-1 text-sm font-semibold text-white">{active_confidence}</span>
                         </div>
-                        <p className="mt-3 text-sm leading-6 text-muted-foreground">{active_notes}</p>
+                        <p className="mt-3 text-sm leading-6 text-slate-300">{active_notes}</p>
                         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
-                            <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-                                <p className="font-medium text-foreground">Part ID</p>
-                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_part_id)}</p>
-                                <p className="mt-1 text-xs">Catalog reference</p>
+                            <div className="rounded-2xl border border-slate-700 bg-slate-900/80 p-4 text-sm text-slate-300">
+                                <p className="font-medium text-white">Part ID</p>
+                                <p className="mt-1 text-base font-semibold text-white">{str(active_part_id)}</p>
+                                <p className="mt-1 text-xs text-slate-400">Catalog reference</p>
                             </div>
-                            <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-                                <p className="font-medium text-foreground">Release range</p>
-                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_release_range)}</p>
-                                <p className="mt-1 text-xs">Start and end years</p>
+                            <div className="rounded-2xl border border-slate-700 bg-slate-900/80 p-4 text-sm text-slate-300">
+                                <p className="font-medium text-white">Release range</p>
+                                <p className="mt-1 text-base font-semibold text-white">{str(active_release_range)}</p>
+                                <p className="mt-1 text-xs text-slate-400">Start and end years</p>
                             </div>
                         </div>
-                        <div className="mt-4 rounded-2xl border border-border bg-card p-4">
+                        <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-900/80 p-4">
                             <div className="flex flex-wrap items-center justify-between gap-3">
                                 <div>
-                                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Detection details</p>
-                                    <p className="mt-1 text-sm text-muted-foreground">Recognition provider, release metadata, and catalog lookup for the detected LEGO part.</p>
+                                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Detection details</p>
+                                    <p className="mt-1 text-sm text-slate-300">Recognition provider, release metadata, and catalog lookup for the detected LEGO part.</p>
                                 </div>
-                                <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground">{provider}</span>
+                                <span className="rounded-full border border-slate-600 bg-slate-950/80 px-3 py-1 text-xs font-medium text-slate-100">{provider}</span>
                             </div>
                             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                                <div className="rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
-                                    <p className="font-medium text-foreground">Recognition summary</p>
-                                    <p className="mt-2">Confidence: <span className="font-semibold text-foreground">{active_confidence}</span></p>
-                                    <p className="mt-1">Color source: <span className="font-semibold text-foreground">{active_color_source}</span></p>
+                                <div className="rounded-2xl bg-slate-950/70 p-4 text-sm text-slate-300">
+                                    <p className="font-medium text-white">Recognition summary</p>
+                                    <p className="mt-2">Confidence: <span className="font-semibold text-white">{active_confidence}</span></p>
+                                    <p className="mt-1">Color source: <span className="font-semibold text-white">{active_color_source}</span></p>
                                 </div>
-                                <div className="rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
-                                    <p className="font-medium text-foreground">Catalog summary</p>
-                                    <p className="mt-2">Years source: <span className="font-semibold text-foreground">{active_years_source}</span></p>
-                                    <p className="mt-1">BrickLink lookup: <span className="font-semibold text-foreground">{active_bricklink_url != "" and "Available" or "Unavailable"}</span></p>
+                                <div className="rounded-2xl bg-slate-950/70 p-4 text-sm text-slate-300">
+                                    <p className="font-medium text-white">Catalog summary</p>
+                                    <p className="mt-2">Years source: <span className="font-semibold text-white">{active_years_source}</span></p>
+                                    <p className="mt-1">BrickLink lookup: <span className="font-semibold text-white">{active_bricklink_url != "" and "Available" or "Unavailable"}</span></p>
                                 </div>
                             </div>
-                            {active_bricklink_url != "" and (<a href={active_bricklink_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl border border-border bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-hover">
+                            {active_bricklink_url != "" and (<a href={active_bricklink_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl border border-slate-600 bg-slate-950/80 px-4 py-2 text-sm font-medium text-slate-100 transition hover:bg-slate-800">
                                 Open on BrickLink
                             </a>)}
                         </div>
                     </div>
                 </div>
 
-                <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-                    <p className="text-sm font-medium text-muted-foreground">Snapshot</p>
-                    <h2 className="mt-1 text-2xl font-semibold text-foreground">Latest capture</h2>
-                    <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-muted">
+                <div className="rounded-3xl border border-border/90 bg-card/95 p-6 shadow-soft backdrop-blur">
+                    <p className="text-sm font-medium tracking-wide text-sky-200">Snapshot</p>
+                    <h2 className="mt-1 text-2xl font-semibold text-white">Latest capture</h2>
+                    <div className="mt-4 overflow-hidden rounded-2xl border border-slate-700 bg-slate-950/70">
                         {captured_frame != "" and (<img src={captured_frame} alt="Captured LEGO frame" className="h-64 w-full object-cover" />)}
-                        {captured_frame == "" and (<div className="flex h-64 items-center justify-center px-6 text-center text-sm text-muted-foreground">No snapshot captured yet.</div>)}
+                        {captured_frame == "" and (<div className="flex h-64 items-center justify-center px-6 text-center text-sm text-slate-300">No snapshot captured yet.</div>)}
                     </div>
                     <div className="mt-4 grid gap-3">
-                        <div className="rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
-                            <p className="font-medium text-foreground">Provider</p>
+                        <div className="rounded-2xl border border-slate-700 bg-slate-900/80 p-4 text-sm text-slate-300">
+                            <p className="font-medium text-white">Provider</p>
                             <p className="mt-1">{provider}</p>
                         </div>
-                        <div className="rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
-                            <p className="font-medium text-foreground">Payload</p>
+                        <div className="rounded-2xl border border-slate-700 bg-slate-900/80 p-4 text-sm text-slate-300">
+                            <p className="font-medium text-white">Payload</p>
                             <p className="mt-1">{payload_text}</p>
                         </div>
-                        <div className="rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
-                            <p className="font-medium text-foreground">Matches</p>
+                        <div className="rounded-2xl border border-slate-700 bg-slate-900/80 p-4 text-sm text-slate-300">
+                            <p className="font-medium text-white">Matches</p>
                             <p className="mt-1">{candidate_text}</p>
                         </div>
                     </div>
