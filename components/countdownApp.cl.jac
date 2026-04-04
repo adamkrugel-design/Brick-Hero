@@ -202,7 +202,7 @@ def:pub CountdownApp() -> JsxElement {
                     <div className="rounded-full border border-border bg-muted px-3 py-1 text-sm text-muted-foreground">{permission}</div>
                 </div>
 
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition plus BrickLink release-year lookup.</p>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition. After the piece is identified, BrickLink is used to look up the color and release-year details.</p>
 
                 <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-black">
                     <div className="relative min-h-80 bg-neutral-950">
