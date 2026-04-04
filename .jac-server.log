@@ -216,7 +216,7 @@ components/countdownApp.cl.jac, line 139, col 29: Missing ';'
 components/countdownApp.cl.jac, line 139, col 31: Missing ';'
 components/countdownApp.cl.jac, line 140, col 20: Missing '}'
 components/countdownApp.cl.jac, line 128, col 9: try statement requires at least one except or finally block
-aded: ./components/countdownApp.cl.jac
+[HMR] Reloaded: ./components/countdownApp.cl.jac
 ✖ Error: Compile error in ./components/countdownApp.cl.jac:
 components/countdownApp.cl.jac, line 139, col 9: Unexpected 'except' -- must follow its parent statement (if/try/match/switch)
 components/countdownApp.cl.jac, line 139, col 26: Missing ';'
@@ -224,3 +224,29 @@ components/countdownApp.cl.jac, line 139, col 29: Missing ';'
 components/countdownApp.cl.jac, line 139, col 31: Missing ';'
 components/countdownApp.cl.jac, line 140, col 20: Missing '}'
 components/countdownApp.cl.jac, line 128, col 9: try statement requires at least one except or finally block
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+components/countdownApp.cl.jac, line 140, col 9: Unexpected 'except' -- must follow its parent statement (if/try/match/switch)
+components/countdownApp.cl.jac, line 140, col 26: Missing ';'
+components/countdownApp.cl.jac, line 140, col 29: Missing ';'
+components/countdownApp.cl.jac, line 140, col 31: Missing ';'
+components/countdownApp.cl.jac, line 141, col 20: Missing '}'
+components/countdownApp.cl.jac, line 129, col 9: try statement requires at least one except or finally block
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+ing '}'
+components/countdownApp.cl.jac, line 129, col 9: try statement requires at least one except or finally block
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js

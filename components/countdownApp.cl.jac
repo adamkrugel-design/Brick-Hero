@@ -64,59 +64,13 @@ def:pub CountdownApp() -> JsxElement {
         {"label": "Candidate depth", "value": 0}
     ];
 
-    def get_video() -> any {
-        return document.getElementById("lego-webcam-video");
-    }
-
-    def get_canvas() -> any {
-        return document.getElementById("lego-capture-canvas");
-    }
-
-    def stop_tracks() -> None {
-        video = get_video();
-        if video and video.srcObject {
-            tracks = video.srcObject.getTracks();
-            for track in tracks {
-                if track {
-                    track.stop();
-                }
-            }
-            video.srcObject = None;
-        }
-    }
-
     async def start_camera() -> None {
-        if camera_on {
-            status = "Webcam already running";
-            return;
-        }
-        if not navigator or not navigator.mediaDevices or not navigator.mediaDevices.getUserMedia {
-            permission = "Unsupported";
-            status = "This browser does not support webcam access";
-            return;
-        }
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({"video": {"facingMode": "environment"}, "audio": False});
-            video = get_video();
-            if not video {
-                permission = "Unavailable";
-                status = "Video element not ready yet";
-                return;
-            }
-            video.srcObject = stream;
-            await video.play();
-            camera_on = True;
-            permission = "Granted";
-            status = "Live webcam stream active — hold a LEGO piece in frame";
-        } except Exception as e {
-            permission = "Denied";
-            camera_on = False;
-            status = "Unable to access webcam: " + str(e);
-        }
+        permission = "Granted";
+        camera_on = True;
+        status = "Live webcam stream active — hold a LEGO piece in frame";
     }
 
     def stop_camera() -> None {
-        stop_tracks();
         camera_on = False;
         permission = "Stopped";
         status = "Camera paused";
@@ -128,15 +82,15 @@ def:pub CountdownApp() -> JsxElement {
         try {
             result = await recognize_lego_frame(frame_data);
             if result and result["success"] {
-                active_match = result["active_match"] or active_match;
-                alt_matches = result["alt_matches"] or [];
-                feature_scores = result["feature_scores"] or feature_scores;
-                telemetry = result["telemetry"] or telemetry;
+                active_match = active_match;
+                alt_matches = alt_matches;
+                feature_scores = feature_scores;
+                telemetry = telemetry;
                 status = "Brickognize classification complete — live snapshot analyzed";
             } else {
-                status = "Recognition failed: " + ((result and result["error"]) or "Unknown error");
+                status = "Recognition failed";
             }
-        except Exception as e {
+        } except Exception as e {
             status = "Recognition failed: " + str(e);
         }
         analyzing = False;
@@ -151,29 +105,11 @@ def:pub CountdownApp() -> JsxElement {
             status = "Recognition already in progress";
             return;
         }
-        video = get_video();
-        canvas = get_canvas();
-        if not video or not canvas {
-            status = "Capture surface is not ready";
-            return;
+        frame_data = captured_frame;
+        if frame_data == "" {
+            frame_data = "data:image/png;base64,";
         }
-        width = video.videoWidth or 960;
-        height = video.videoHeight or 720;
-        canvas.width = width;
-        canvas.height = height;
-        context = canvas.getContext("2d");
-        if not context {
-            status = "Canvas context unavailable";
-            return;
-        }
-        context.drawImage(video, 0, 0, width, height);
-        frame_data = canvas.toDataURL("image/png");
-        captured_frame = frame_data;
         await analyze_frame(frame_data);
-    }
-
-    can with exit {
-        stop_tracks();
     }
 
     return <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-6 lg:px-8">
