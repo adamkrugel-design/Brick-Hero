@@ -19,14 +19,18 @@ def parse_data_url(frame_data: str) -> tuple[str, bytes] {
 }
 
 
-def safe_get(source: any, key: str) -> any {
+def safe_get(source: any, key: str, fallback: any) -> any {
     if source == None {
-        return None;
+        return fallback;
     }
     try {
-        return source.get(key);
+        value = source.get(key);
+        if value == None {
+            return fallback;
+        }
+        return value;
     } except Exception {
-        return None;
+        return fallback;
     }
 }
 
@@ -40,7 +44,7 @@ def normalize_items(payload: any) -> list {
     }
     if type(payload) == dict {
         for key in ["items", "predictions", "results"] {
-            value = safe_get(payload, key);
+            value = safe_get(payload, key, []);
             if type(value) == list {
                 return value;
             }
@@ -52,7 +56,7 @@ def normalize_items(payload: any) -> list {
 
 def item_name(item: any) -> str {
     for key in ["name", "label", "class_name", "id", "part_num"] {
-        value = safe_get(item, key);
+        value = safe_get(item, key, "");
         if value {
             return str(value);
         }
@@ -63,7 +67,7 @@ def item_name(item: any) -> str {
 
 def item_confidence(item: any) -> int {
     for key in ["score", "confidence", "probability"] {
-        value = safe_get(item, key);
+        value = safe_get(item, key, None);
         if value != None {
             try {
                 numeric = float(value);
@@ -82,7 +86,7 @@ def item_confidence(item: any) -> int {
 
 def item_image(item: any) -> str {
     for key in ["image", "image_url", "thumbnail", "thumbnail_url"] {
-        value = safe_get(item, key);
+        value = safe_get(item, key, "");
         if value {
             return str(value);
         }
@@ -93,7 +97,7 @@ def item_image(item: any) -> str {
 
 def item_external_url(item: any) -> str {
     for key in ["url", "external_url", "bricklink_url", "brickset_url"] {
-        value = safe_get(item, key);
+        value = safe_get(item, key, "");
         if value {
             return str(value);
         }
@@ -104,7 +108,7 @@ def item_external_url(item: any) -> str {
 
 def item_notes(item: any) -> str {
     for key in ["description", "category", "part_num", "id"] {
-        value = safe_get(item, key);
+        value = safe_get(item, key, "");
         if value {
             return str(value);
         }
@@ -176,10 +180,7 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
     }
 
     if len(ranked) == 0 {
-        fallback_name = safe_get(payload, "name");
-        if not fallback_name {
-            fallback_name = "Unknown part";
-        }
+        fallback_name = safe_get(payload, "name", "Unknown part");
         ranked = [{
             "name": str(fallback_name),
             "confidence_value": item_confidence(payload),

@@ -148,12 +148,79 @@ services/recognition.sv.jac, line 31, col 1: Unexpected token '}'
 services/recognition.sv.jac, line 112, col 1: Missing ';'
 services/recognition.sv.jac, line 209, col 1: Missing '}'
 [HMR] Reloaded: ./services/recognition.sv.jac
-ognition.sv.jac, line 27, col 40: Unexpected semicolon at module level
-services/recognition.sv.jac, line 28, col 5: Unexpected token '}'
-services/recognition.sv.jac, line 29, col 9: Unexpected token 'return'
-services/recognition.sv.jac, line 29, col 23: Unexpected semicolon at module level
-services/recognition.sv.jac, line 30, col 5: Unexpected token '}'
-services/recognition.sv.jac, line 31, col 1: Unexpected token '}'
-services/recognition.sv.jac, line 112, col 1: Missing ';'
-services/recognition.sv.jac, line 209, col 1: Missing '}'
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+components/countdownApp.cl.jac, line 139, col 17: Missing ';'
+components/countdownApp.cl.jac, line 139, col 27: Missing ';'
+components/countdownApp.cl.jac, line 139, col 30: Missing ';'
+components/countdownApp.cl.jac, line 139, col 32: Missing ';'
+components/countdownApp.cl.jac, line 140, col 20: Missing '}'
+components/countdownApp.cl.jac, line 179, col 5: Unexpected token 'return'
+components/countdownApp.cl.jac, line 214, col 182: Unexpected token '}'
+components/countdownApp.cl.jac, line 220, col 134: Unexpected toke✖ Error: Compile error in ./components/countdownApp.cl.jac:
+components/countdownApp.cl.jac, line 139, col 17: Missing ';'
+components/countdownApp.cl.jac, line 139, col 27: Missing ';'
+components/countdownApp.cl.jac, line 139, col 30: Missing ';'
+components/countdownApp.cl.jac, line 139, col 32: Missing ';'
+components/countdownApp.cl.jac, line 140, col 20: Missing '}'
+components/countdownApp.cl.jac, line 179, col 5: Unexpected token 'return'
+components/countdownApp.cl.jac, line 214, col 182: Unexpected token '}'
+components/countdownApp.cl.jac, line 220, col 134: Unexpected token '}'
+components/countdownApp.cl.jac, line 220, col 147: Unexpected token '}'
+components/countdownApp.cl.jac, line 220, col 166: Unexpected token '}'
+components/countdownApp.cl.jac, line 229, col 35: Unexpected token '}'
+components/countdownApp.cl.jac, line 236, col 244: Unexpected token '}'
+components/countdownApp.cl.jac, line 237, col 295: Unexpected token '}'
+components/countdownApp.cl.jac, line 237, col 316: Unexpected token '}'
+components/countdownApp.cl.jac, line 237, col 372: Unexpected token '}'
+components/countdownApp.cl.jac, line 238, col 245: Unexpected token '}'
+components/countdownApp.cl.jac, line 242, col 104: Unexpected token '}'
+components/countdownApp.cl.jac, line 256, col 143: Unexpected token '}'
+components/countdownApp.cl.jac, line 258, col 211: Unexpected token '}'
+components/countdownApp.cl.jac, line 260, col 109: Unexpected token '}'
+components/countdownApp.cl.jac, line 260, col 160: Unexpected token '}'
+components/countdownApp.cl.jac, line 260, col 265: Unexpected token '}'
+components/countdownApp.cl.jac, line 261, col 185: Unexpected token '}'
+components/countdownApp.cl.jac, line 262, col 107: Unexpected token '}'
+components/countdownApp.cl.jac, line 263, col 104: Unexpected token '}'
+components/countdownApp.cl.jac, line 263, col 252: Unexpected token '}'
+components/countdownApp.cl.jac, line 267, col 64: Unexpected token '}'
+components/countdownApp.cl.jac, line 268, col 74: Unexpected token '}'
+components/countdownApp.cl.jac, line 269, col 76: Unexpected token '}'
+components/countdownApp.cl.jac, line 270, col 64: Unexpected token '}'
+components/countdownApp.cl.jac, line 271, col 60: Unexpected token '}'
+components/countdownApp.cl.jac, line 272, col 32: Unexpected token 'for'
+components/countdownApp.cl.jac, line 272, col 56: Unexpected token 'if'
+components/countdownApp.cl.jac, line 273, col 26: Unexpected token '}'
+components/countdownApp.cl.jac, line 281, col 75: Unexpected token '}'
+components/countdownApp.cl.jac, line 281, col 142: Unexpected token '}'
+components/countdownApp.cl.jac, line 282, col 243: Unexpected token '}'
+components/countdownApp.cl.jac, line 287, col 116: Unexpected token '}'
+components/countdownApp.cl.jac, line 291, col 115: Unexpected token '}'
+components/countdownApp.cl.jac, line 291, col 148: Unexpected token '}'
+components/countdownApp.cl.jac, line 295, col 111: Unexpected token '}'
+components/countdownApp.cl.jac, line 306, col 71: Unexpected token '}'
+components/countdownApp.cl.jac, line 30✖ Error: Import error in ./services/recognition.sv.jac: No bytecode found for /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/services/recognition.sv.jac
+✖ Error: Import error in ./components/countdownApp.cl.jac: No bytecode found for /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/services/recognition.sv.jac
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+services/recognition.sv.jac, line 1, col 7: Missing ';'
+services/recognition.sv.jac, line 1, col 7: Unexpected token ':'
+services/recognition.sv.jac, line 1, col 35: Unexpected token '}'
 [HMR] Reloaded: ./services/recognition.sv.jac
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+components/countdownApp.cl.jac, line 139, col 9: Unexpected 'except' -- must follow its parent statement (if/try/match/switch)
+components/countdownApp.cl.jac, line 139, col 26: Missing ';'
+components/countdownApp.cl.jac, line 139, col 29: Missing ';'
+components/countdownApp.cl.jac, line 139, col 31: Missing ';'
+components/countdownApp.cl.jac, line 140, col 20: Missing '}'
+components/countdownApp.cl.jac, line 128, col 9: try statement requires at least one except or finally block
+aded: ./components/countdownApp.cl.jac
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+components/countdownApp.cl.jac, line 139, col 9: Unexpected 'except' -- must follow its parent statement (if/try/match/switch)
+components/countdownApp.cl.jac, line 139, col 26: Missing ';'
+components/countdownApp.cl.jac, line 139, col 29: Missing ';'
+components/countdownApp.cl.jac, line 139, col 31: Missing ';'
+components/countdownApp.cl.jac, line 140, col 20: Missing '}'
+components/countdownApp.cl.jac, line 128, col 9: try statement requires at least one except or finally block

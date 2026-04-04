@@ -1,23 +1,67 @@
 sv import from ..services.recognition { recognize_lego_frame }
 
+
+def:pub AltMatchCard(props: dict) -> JsxElement {
+    name = str(props["name"] or "Unknown part");
+    confidence = str(props["confidence"] or "0%");
+    image = str(props["image"] or "");
+    url = str(props["url"] or "");
+
+    return (
+        <div className="rounded-[1.25rem] border border-fuchsia-300/20 bg-fuchsia-400/6 p-4 shadow-soft">
+            <div className="flex items-start justify-between gap-3">
+                <div>
+                    <p className="retro-display text-xs font-semibold tracking-[0.24em] text-fuchsia-200/80">Secondary lock</p>
+                    <h3 className="retro-display text-lg font-bold text-cyan-100">{name}</h3>
+                </div>
+                <span className="retro-display inline-flex rounded-full border border-fuchsia-300/30 bg-fuchsia-500 px-3 py-1 text-xs font-bold text-white">{confidence}</span>
+            </div>
+            {image != "" and <img src={image} alt={name} className="mt-3 h-28 w-full rounded-xl border border-fuchsia-300/20 object-contain bg-slate-950/80 p-2" />}
+            {url != "" and <a href={url} target="_blank" className="mt-3 inline-flex text-xs font-semibold uppercase tracking-[0.22em] text-fuchsia-200 hover:text-white">Open reference ↗</a>}
+        </div>
+    );
+}
+
+
+def:pub FeatureScoreRow(props: dict) -> JsxElement {
+    label = str(props["label"] or "Signal");
+    value = int(props["value"] or 0);
+    width_style = {"width": str(value) + "%"};
+
+    return (
+        <div>
+            <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+                <span className="retro-display text-xs font-semibold text-cyan-100">{label}</span>
+                <span className="text-cyan-100/70">{str(value)}%</span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full border border-cyan-300/20 bg-slate-950">
+                <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-amber-300" style={width_style}></div>
+            </div>
+        </div>
+    );
+}
+
+
 def:pub CountdownApp() -> JsxElement {
     has camera_on: bool = False;
     has analyzing: bool = False;
     has status: str = "Camera ready to start";
     has permission: str = "Not requested";
     has captured_frame: str = "";
-    has telemetry: dict = {"width": 0, "height": 0, "avg_red": 0, "avg_green": 0, "avg_blue": 0, "ratio": 0.0};
+    has telemetry: dict = {"provider": "Brickognize", "candidate_count": 0, "mime_type": "image/jpeg", "bytes": 0};
     has active_match: dict = {
         "name": "Waiting for live analysis",
         "confidence": "0%",
         "color": "Unknown",
-        "notes": "Start the webcam and capture a frame to run operational LEGO recognition."
+        "notes": "Start the webcam and capture a frame to run Brickognize classification.",
+        "image": "",
+        "url": ""
     };
     has alt_matches: list = [];
     has feature_scores: list = [
-        {"label": "Shape similarity", "value": 0},
-        {"label": "Color similarity", "value": 0},
-        {"label": "Stud / surface confidence", "value": 0}
+        {"label": "Model confidence", "value": 0},
+        {"label": "API response quality", "value": 0},
+        {"label": "Candidate depth", "value": 0}
     ];
 
     def get_video() -> any {
@@ -80,7 +124,7 @@ def:pub CountdownApp() -> JsxElement {
 
     async def analyze_frame(frame_data: str) -> None {
         analyzing = True;
-        status = "Running operational recognition on the captured frame...";
+        status = "Sending captured snapshot to Brickognize...";
         try {
             result = await recognize_lego_frame(frame_data);
             if result and result["success"] {
@@ -88,11 +132,11 @@ def:pub CountdownApp() -> JsxElement {
                 alt_matches = result["alt_matches"] or [];
                 feature_scores = result["feature_scores"] or feature_scores;
                 telemetry = result["telemetry"] or telemetry;
-                status = "Operational recognition complete — results updated from backend analysis";
+                status = "Brickognize classification complete — live snapshot analyzed";
             } else {
                 status = "Recognition failed: " + ((result and result["error"]) or "Unknown error");
             }
-        } except Exception as e {
+        except Exception as e {
             status = "Recognition failed: " + str(e);
         }
         analyzing = False;
@@ -123,7 +167,7 @@ def:pub CountdownApp() -> JsxElement {
             return;
         }
         context.drawImage(video, 0, 0, width, height);
-        frame_data = canvas.toDataURL("image/jpeg", 0.92);
+        frame_data = canvas.toDataURL("image/png");
         captured_frame = frame_data;
         await analyze_frame(frame_data);
     }
@@ -209,24 +253,24 @@ def:pub CountdownApp() -> JsxElement {
                             <div className="flex items-start justify-between gap-3">
                                 <div>
                                     <p className="retro-display text-xs font-semibold tracking-[0.24em] text-cyan-300/80">Primary lock</p>
-                                    <h3 className="retro-display text-lg font-bold text-cyan-100">{active_match["name"]}</h3>
+                                    <h3 className="retro-display text-lg font-bold text-cyan-100">{str(active_match["name"] or "Unknown part")}</h3>
                                 </div>
-                                <span className="retro-display inline-flex rounded-full border border-cyan-300/30 bg-cyan-400 px-3 py-1 text-xs font-bold text-slate-950">{active_match["confidence"]}</span>
+                                <span className="retro-display inline-flex rounded-full border border-cyan-300/30 bg-cyan-400 px-3 py-1 text-xs font-bold text-slate-950">{str(active_match["confidence"] or "0%")}</span>
                             </div>
-                            <p className="mt-3 text-sm text-cyan-100/75"><span className="font-semibold text-cyan-100">Colorway:</span> {active_match["color"]}</p>
-                            <p className="mt-2 text-sm text-cyan-100/70">{active_match["notes"]}</p>
+                            {str(active_match["image"] or "") != "" and <img src={str(active_match["image"])} alt={str(active_match["name"] or "Detected part")} className="mt-3 h-32 w-full rounded-xl border border-cyan-300/20 object-contain bg-slate-950/80 p-2" />}
+                            <p className="mt-3 text-sm text-cyan-100/75"><span className="font-semibold text-cyan-100">Source:</span> {str(active_match["color"] or "Brickognize model")}</p>
+                            <p className="mt-2 text-sm text-cyan-100/70">{str(active_match["notes"] or "")}</p>
+                            {str(active_match["url"] or "") != "" and <a href={str(active_match["url"])} target="_blank" className="mt-3 inline-flex text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200 hover:text-white">Open reference ↗</a>}
                         </div>
-                        {[(
-                            <div key={item["name"]} className="rounded-[1.25rem] border border-fuchsia-300/20 bg-fuchsia-400/6 p-4 shadow-soft">
-                                <div className="flex items-start justify-between gap-3">
-                                    <div>
-                                        <p className="retro-display text-xs font-semibold tracking-[0.24em] text-fuchsia-200/80">Secondary lock</p>
-                                        <h3 className="retro-display text-lg font-bold text-cyan-100">{item["name"]}</h3>
-                                    </div>
-                                    <span className="retro-display inline-flex rounded-full border border-fuchsia-300/30 bg-fuchsia-500 px-3 py-1 text-xs font-bold text-white">{item["confidence"]}</span>
-                                </div>
-                            </div>
-                        ) for item in alt_matches if item]}
+                        {[
+                            <AltMatchCard
+                                key={str(item["name"] or "alt")}
+                                name={str(item["name"] or "Unknown part")}
+                                confidence={str(item["confidence"] or "0%")}
+                                image={str(item["image"] or "")}
+                                url={str(item["url"] or "")}
+                            /> for item in alt_matches if item
+                        ]}
                     </div>
                 </div>
 
@@ -235,16 +279,20 @@ def:pub CountdownApp() -> JsxElement {
                     <h2 className="retro-display mt-2 text-2xl font-extrabold text-cyan-100">Latest snapshot</h2>
                     <div className="mt-5 overflow-hidden rounded-[1.5rem] border-2 border-cyan-300/25 bg-slate-950">
                         {captured_frame != "" and <img src={captured_frame} alt="Captured LEGO frame" className="h-64 w-full object-cover" />}
-                        {captured_frame == "" and <div className="flex h-64 items-center justify-center px-6 text-center text-sm text-cyan-100/60">Capture a frame from the live webcam feed to preview the exact image used for recognition.</div>}
+                        {captured_frame == "" and <div className="flex h-64 items-center justify-center px-6 text-center text-sm text-cyan-100/60">Capture a frame from the live webcam feed to preview the exact image sent to Brickognize.</div>}
                     </div>
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
                         <div className="rounded-2xl border border-cyan-300/20 bg-cyan-400/6 p-4 text-sm text-cyan-100/70">
-                            <p className="retro-display text-xs text-cyan-100">Frame size</p>
-                            <p className="mt-1 text-base text-cyan-50">{str(telemetry["width"])} × {str(telemetry["height"])} px</p>
+                            <p className="retro-display text-xs text-cyan-100">Provider</p>
+                            <p className="mt-1 text-base text-cyan-50">{str(telemetry["provider"] or "Brickognize")}</p>
                         </div>
                         <div className="rounded-2xl border border-amber-300/20 bg-amber-300/8 p-4 text-sm text-cyan-100/70">
-                            <p className="retro-display text-xs text-cyan-100">Average RGB</p>
-                            <p className="mt-1 text-base text-cyan-50">{str(telemetry["avg_red"])} / {str(telemetry["avg_green"])} / {str(telemetry["avg_blue"])} · ratio {str(round(telemetry["ratio"], 2))}</p>
+                            <p className="retro-display text-xs text-cyan-100">Payload</p>
+                            <p className="mt-1 text-base text-cyan-50">{str(telemetry["mime_type"] or "image/png")} · {str(telemetry["bytes"] or 0)} bytes</p>
+                        </div>
+                        <div className="rounded-2xl border border-cyan-300/20 bg-cyan-400/6 p-4 text-sm text-cyan-100/70 sm:col-span-2">
+                            <p className="retro-display text-xs text-cyan-100">Candidate count</p>
+                            <p className="mt-1 text-base text-cyan-50">{str(telemetry["candidate_count"] or 0)} ranked matches returned from Brickognize</p>
                         </div>
                     </div>
                 </div>
@@ -253,17 +301,13 @@ def:pub CountdownApp() -> JsxElement {
                     <p className="retro-display text-xs font-semibold tracking-[0.28em] text-cyan-300/80">Feature confidence</p>
                     <h2 className="retro-display mt-2 text-2xl font-extrabold text-cyan-100">Recognition signals</h2>
                     <div className="mt-5 space-y-4">
-                        {[(
-                            <div key={feature["label"]}>
-                                <div className="mb-2 flex items-center justify-between gap-3 text-sm">
-                                    <span className="retro-display text-xs font-semibold text-cyan-100">{feature["label"]}</span>
-                                    <span className="text-cyan-100/70">{feature["value"]}%</span>
-                                </div>
-                                <div className="h-3 overflow-hidden rounded-full border border-cyan-300/20 bg-slate-950">
-                                    <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-amber-300" style={{"width": str(feature["value"]) + "%"}}></div>
-                                </div>
-                            </div>
-                        ) for feature in feature_scores if feature]}
+                        {[
+                            <FeatureScoreRow
+                                key={str(feature["label"] or "signal")}
+                                label={str(feature["label"] or "Signal")}
+                                value={int(feature["value"] or 0)}
+                            /> for feature in feature_scores if feature
+                        ]}
                     </div>
                 </div>
             </section>
