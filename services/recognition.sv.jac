@@ -297,8 +297,44 @@ def nearest_bricklink_color(avg_red: int, avg_green: int, avg_blue: int) -> dict
     palette = bricklink_color_palette();
     best_match = {"label": "Unknown", "r": avg_red, "g": avg_green, "b": avg_blue};
     best_distance = -1;
+    channel_max = avg_red;
+    if avg_green > channel_max {
+        channel_max = avg_green;
+    }
+    if avg_blue > channel_max {
+        channel_max = avg_blue;
+    }
+    channel_min = avg_red;
+    if avg_green < channel_min {
+        channel_min = avg_green;
+    }
+    if avg_blue < channel_min {
+        channel_min = avg_blue;
+    }
+    saturation = channel_max - channel_min;
     for swatch in palette {
         distance = ((avg_red - swatch["r"]) * (avg_red - swatch["r"])) + ((avg_green - swatch["g"]) * (avg_green - swatch["g"])) + ((avg_blue - swatch["b"]) * (avg_blue - swatch["b"]));
+        swatch_max = swatch["r"];
+        if swatch["g"] > swatch_max {
+            swatch_max = swatch["g"];
+        }
+        if swatch["b"] > swatch_max {
+            swatch_max = swatch["b"];
+        }
+        swatch_min = swatch["r"];
+        if swatch["g"] < swatch_min {
+            swatch_min = swatch["g"];
+        }
+        if swatch["b"] < swatch_min {
+            swatch_min = swatch["b"];
+        }
+        swatch_saturation = swatch_max - swatch_min;
+        if saturation >= 28 and swatch_saturation < 18 {
+            distance = distance + 12000;
+        }
+        if saturation <= 18 and swatch_saturation > 70 {
+            distance = distance + 5000;
+        }
         if best_distance < 0 or distance < best_distance {
             best_distance = distance;
             best_match = swatch;
@@ -314,10 +350,10 @@ def estimate_image_color(raw: bytes) -> dict {
     }
 
     sample_limit = len(raw);
-    if sample_limit > 3072 {
-        sample_limit = 3072;
+    if sample_limit > 12288 {
+        sample_limit = 12288;
     }
-    if sample_limit < 3 {
+    if sample_limit < 24 {
         return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
     }
 
@@ -325,13 +361,44 @@ def estimate_image_color(raw: bytes) -> dict {
     green_total = 0;
     blue_total = 0;
     pixel_count = 0;
-    idx = 0;
+    idx = 8;
+    stride = 29;
     while idx + 2 < sample_limit {
-        red_total = red_total + int(raw[idx]);
-        green_total = green_total + int(raw[idx + 1]);
-        blue_total = blue_total + int(raw[idx + 2]);
-        pixel_count = pixel_count + 1;
-        idx = idx + 3;
+        first = int(raw[idx]);
+        second = int(raw[idx + 1]);
+        third = int(raw[idx + 2]);
+        channel_max = first;
+        if second > channel_max {
+            channel_max = second;
+        }
+        if third > channel_max {
+            channel_max = third;
+        }
+        channel_min = first;
+        if second < channel_min {
+            channel_min = second;
+        }
+        if third < channel_min {
+            channel_min = third;
+        }
+        if channel_max - channel_min > 10 {
+            red_total = red_total + first;
+            green_total = green_total + second;
+            blue_total = blue_total + third;
+            pixel_count = pixel_count + 1;
+        }
+        idx = idx + stride;
+    }
+
+    if pixel_count == 0 {
+        idx = 8;
+        while idx + 2 < sample_limit {
+            red_total = red_total + int(raw[idx]);
+            green_total = green_total + int(raw[idx + 1]);
+            blue_total = blue_total + int(raw[idx + 2]);
+            pixel_count = pixel_count + 1;
+            idx = idx + stride;
+        }
     }
 
     if pixel_count == 0 {
