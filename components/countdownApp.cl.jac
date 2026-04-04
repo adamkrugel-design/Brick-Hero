@@ -14,6 +14,8 @@ def:pub CountdownApp() -> JsxElement {
     has active_part_id: str = "—";
     has active_years: str = "Unknown";
     has active_years_source: str = "BrickLink";
+    has active_color: str = "Unknown";
+    has active_color_source: str = "Brickognize";
     has active_bricklink_url: str = "";
     has provider: str = "Brickognize";
     has payload_text: str = "image/png · 0 bytes";
@@ -123,12 +125,15 @@ def:pub CountdownApp() -> JsxElement {
                 match_info = result["active_match"] or {};
                 telemetry = result["telemetry"] or {};
                 years_info = match_info["years_released"] or {};
+                color_info = match_info["color"] or {};
                 active_name = str(match_info["name"] or "Unknown part");
                 active_confidence = str(match_info["confidence"] or "0%");
                 active_notes = str(match_info["notes"] or "Recognition complete.");
                 active_part_id = str(match_info["part_id"] or "—");
                 active_years = str(years_info["label"] or "Unknown");
                 active_years_source = str(years_info["source"] or "BrickLink");
+                active_color = str(color_info["label"] or "Unknown");
+                active_color_source = str(color_info["source"] or "Brickognize");
                 active_bricklink_url = str(match_info["bricklink_url"] or "");
                 provider = str(telemetry["provider"] or "Brickognize");
                 payload_text = str(telemetry["mime_type"] or "image/png") + " · " + str(telemetry["bytes"] or 0) + " bytes";
@@ -223,7 +228,7 @@ def:pub CountdownApp() -> JsxElement {
                             <span className="rounded-full bg-card px-3 py-1 text-sm font-medium text-foreground">{active_confidence}</span>
                         </div>
                         <p className="mt-3 text-sm leading-6 text-muted-foreground">{active_notes}</p>
-                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <div className="mt-4 grid gap-3 sm:grid-cols-3">
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Part ID</p>
                                 <p className="mt-1">{active_part_id}</p>
@@ -232,6 +237,11 @@ def:pub CountdownApp() -> JsxElement {
                                 <p className="font-medium text-foreground">Years released</p>
                                 <p className="mt-1">{active_years}</p>
                                 <p className="mt-1 text-xs">Source: {active_years_source}</p>
+                            </div>
+                            <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
+                                <p className="font-medium text-foreground">Detected color</p>
+                                <p className="mt-1">{active_color}</p>
+                                <p className="mt-1 text-xs">Source: {active_color_source}</p>
                             </div>
                         </div>
                         {(active_bricklink_url != "") and (

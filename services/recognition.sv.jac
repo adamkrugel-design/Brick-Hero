@@ -132,6 +132,44 @@ def item_bricklink_url(item: any, part_id: str) -> str {
 }
 
 
+def item_color(item: any) -> dict {
+    for key in ["color_name", "color", "color_label"] {
+        value = safe_get(item, key, "");
+        if value {
+            return {"label": str(value), "source": "Brickognize"};
+        }
+    }
+
+    color_info = safe_get(item, "color_info", None);
+    if type(color_info) == dict {
+        for key in ["name", "label"] {
+            value = safe_get(color_info, key, "");
+            if value {
+                return {"label": str(value), "source": "Brickognize"};
+            }
+        }
+    }
+
+    colors = safe_get(item, "colors", []);
+    if type(colors) == list and len(colors) > 0 {
+        first_color = colors[0];
+        if type(first_color) == dict {
+            for key in ["name", "label"] {
+                value = safe_get(first_color, key, "");
+                if value {
+                    return {"label": str(value), "source": "Brickognize"};
+                }
+            }
+        }
+        if first_color {
+            return {"label": str(first_color), "source": "Brickognize"};
+        }
+    }
+
+    return {"label": "Unknown", "source": "Brickognize"};
+}
+
+
 def parse_years_released(page_text: str) -> dict {
     if not page_text {
         return {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"};
@@ -257,6 +295,7 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
     best_notes = "Trained Brickognize classification result.";
     best_part_id = "";
     best_bricklink_url = "";
+    best_color = {"label": "Unknown", "source": "Brickognize"};
 
     if len(items) > 0 {
         first = items[0];
@@ -265,12 +304,14 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
         best_notes = item_notes(first);
         best_part_id = item_part_id(first);
         best_bricklink_url = item_bricklink_url(first, best_part_id);
+        best_color = item_color(first);
     } else {
         best_name = str(safe_get(payload, "name", "Unknown part"));
         best_confidence_value = item_confidence(payload);
         best_notes = item_notes(payload);
         best_part_id = item_part_id(payload);
         best_bricklink_url = item_bricklink_url(payload, best_part_id);
+        best_color = item_color(payload);
     }
 
     years_released = fetch_bricklink_years(best_part_id, best_bricklink_url);
@@ -284,6 +325,7 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
             "part_id": best_part_id,
             "bricklink_url": best_bricklink_url,
             "years_released": years_released,
+            "color": best_color,
         },
         "telemetry": {
             "provider": "Brickognize",
