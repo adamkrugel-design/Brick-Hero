@@ -271,6 +271,43 @@ def parse_years_released(page_text: str) -> dict {
 }
 
 
+def bricklink_color_palette() -> list {
+    return [
+        {"label": "Black", "r": 27, "g": 42, "b": 52},
+        {"label": "White", "r": 242, "g": 243, "b": 242},
+        {"label": "Light Bluish Gray", "r": 160, "g": 165, "b": 169},
+        {"label": "Dark Bluish Gray", "r": 99, "g": 95, "b": 98},
+        {"label": "Red", "r": 196, "g": 40, "b": 27},
+        {"label": "Blue", "r": 13, "g": 105, "b": 171},
+        {"label": "Green", "r": 40, "g": 127, "b": 70},
+        {"label": "Dark Green", "r": 40, "g": 70, "b": 45},
+        {"label": "Yellow", "r": 245, "g": 205, "b": 47},
+        {"label": "Tan", "r": 228, "g": 205, "b": 158},
+        {"label": "Dark Tan", "r": 149, "g": 138, "b": 115},
+        {"label": "Brown", "r": 124, "g": 92, "b": 70},
+        {"label": "Reddish Brown", "r": 105, "g": 64, "b": 40},
+        {"label": "Orange", "r": 218, "g": 133, "b": 65},
+        {"label": "Dark Orange", "r": 160, "g": 95, "b": 53},
+        {"label": "Trans-Clear", "r": 236, "g": 236, "b": 236},
+    ];
+}
+
+
+def nearest_bricklink_color(avg_red: int, avg_green: int, avg_blue: int) -> dict {
+    palette = bricklink_color_palette();
+    best_match = {"label": "Unknown", "r": avg_red, "g": avg_green, "b": avg_blue};
+    best_distance = -1;
+    for swatch in palette {
+        distance = ((avg_red - swatch["r"]) * (avg_red - swatch["r"])) + ((avg_green - swatch["g"]) * (avg_green - swatch["g"])) + ((avg_blue - swatch["b"]) * (avg_blue - swatch["b"]));
+        if best_distance < 0 or distance < best_distance {
+            best_distance = distance;
+            best_match = swatch;
+        }
+    }
+    return best_match;
+}
+
+
 def estimate_image_color(raw: bytes) -> dict {
     if not raw {
         return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
@@ -305,35 +342,14 @@ def estimate_image_color(raw: bytes) -> dict {
     avg_green = int(round(green_total / pixel_count));
     avg_blue = int(round(blue_total / pixel_count));
     rgb_text = str(avg_red) + ", " + str(avg_green) + ", " + str(avg_blue);
+    matched = nearest_bricklink_color(avg_red, avg_green, avg_blue);
 
-    palette = [
-        {"label": "Black", "r": 27, "g": 42, "b": 52},
-        {"label": "White", "r": 242, "g": 243, "b": 242},
-        {"label": "Light Bluish Gray", "r": 160, "g": 165, "b": 169},
-        {"label": "Dark Bluish Gray", "r": 99, "g": 95, "b": 98},
-        {"label": "Red", "r": 196, "g": 40, "b": 27},
-        {"label": "Blue", "r": 13, "g": 105, "b": 171},
-        {"label": "Green", "r": 40, "g": 127, "b": 70},
-        {"label": "Yellow", "r": 245, "g": 205, "b": 47},
-        {"label": "Tan", "r": 228, "g": 205, "b": 158},
-        {"label": "Brown", "r": 124, "g": 92, "b": 70},
-        {"label": "Dark Tan", "r": 149, "g": 138, "b": 115},
-        {"label": "Orange", "r": 218, "g": 133, "b": 65},
-        {"label": "Dark Green", "r": 40, "g": 70, "b": 45},
-        {"label": "Trans-Clear", "r": 236, "g": 236, "b": 236},
-    ];
-
-    best_label = "Unknown";
-    best_distance = -1;
-    for swatch in palette {
-        distance = ((avg_red - swatch["r"]) * (avg_red - swatch["r"])) + ((avg_green - swatch["g"]) * (avg_green - swatch["g"])) + ((avg_blue - swatch["b"]) * (avg_blue - swatch["b"]));
-        if best_distance < 0 or distance < best_distance {
-            best_distance = distance;
-            best_label = str(swatch["label"]);
-        }
-    }
-
-    return {"label": best_label, "source": "Image fallback", "rgb": rgb_text};
+    return {
+        "label": str(matched["label"]),
+        "source": "Image fallback → BrickLink match",
+        "rgb": rgb_text,
+        "bricklink_match": str(matched["label"]),
+    };
 }
 
 
@@ -438,12 +454,16 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
 
     bricklink_metadata = fetch_bricklink_metadata(best_part_id, best_bricklink_url);
     years_released = safe_get(bricklink_metadata, "years_released", {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"});
-    best_color = safe_get(bricklink_metadata, "color", {"label": "Unknown", "source": "BrickLink"});
+    bricklink_color = safe_get(bricklink_metadata, "color", {"label": "Unknown", "source": "BrickLink"});
     fallback_color = estimate_image_color(raw);
-    color_label = str(safe_get(best_color, "label", "Unknown"));
-    if color_label == "Unknown" or color_label == "Unavailable" or color_label == "" {
-        best_color = fallback_color;
+    best_color = fallback_color;
+    bricklink_color_label = str(safe_get(bricklink_color, "label", "Unknown"));
+    if bricklink_color_label and bricklink_color_label != "Unknown" and bricklink_color_label != "Unavailable" {
+        best_color["bricklink_variant"] = bricklink_color_label;
+    } else {
+        best_color["bricklink_variant"] = str(safe_get(fallback_color, "bricklink_match", safe_get(fallback_color, "label", "Unknown")));
     }
+    best_color["label"] = str(safe_get(best_color, "bricklink_variant", safe_get(best_color, "label", "Unknown")));
 
     return {
         "success": True,
