@@ -21,16 +21,36 @@ cl def:pub app -> JsxElement {
                 status = "This browser does not expose mediaDevices";
                 return;
             }
-            video = web.document.getElementById("scanner-video");
-            stream = await media_devices.getUserMedia({"video": True, "audio": False});
-            if video {
-                video.srcObject = stream;
-                await video.play();
+            existing_stream = web.window.__legoScannerStream;
+            if existing_stream {
+                tracks = existing_stream.getTracks();
+                for track in tracks {
+                    track.stop();
+                }
             }
+            permission = "Requesting";
+            status = "Requesting webcam access...";
+            video = web.document.getElementById("scanner-video");
+            if not video {
+                permission = "Unavailable";
+                status = "Video element not found";
+                return;
+            }
+            video.srcObject = None;
+            video.muted = True;
+            video.autoplay = True;
+            video.playsInline = True;
+            try {
+                stream = await media_devices.getUserMedia({"video": {"width": {"ideal": 1280}, "height": {"ideal": 720}}, "audio": False});
+            } catch Exception {
+                stream = await media_devices.getUserMedia({"video": True, "audio": False});
+            }
+            video.srcObject = stream;
+            await video.play();
             web.window.__legoScannerStream = stream;
             permission = "Granted";
             status = "Webcam active";
-        } except Exception as e {
+        } catch Exception as e {
             permission = "Denied";
             status = "Unable to start webcam: " + str(e);
         }
