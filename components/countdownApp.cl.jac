@@ -12,31 +12,22 @@ def:pub CountdownApp() -> JsxElement {
     has payload_text: str = "image/png · 0 bytes";
     has candidate_text: str = "0 matches returned";
 
-    can with entry {
-        status = "Camera ready";
-        permission = "Idle";
-        try {
-            web.window.__legoScannerPing = "ready";
-        } except Exception {
-        }
-    }
-
     async def start_camera() -> None {
         try {
             permission = "Requesting";
             status = "Requesting webcam access...";
+
             media_devices = web.navigator.mediaDevices;
             if not media_devices {
                 permission = "Unavailable";
-                status = "This browser does not expose mediaDevices";
+                status = "This browser does not support webcam access";
                 return;
             }
 
             existing_stream = web.window.__legoScannerStream;
             if existing_stream {
-                existing_tracks = existing_stream.getTracks();
-                for existing_track in existing_tracks {
-                    existing_track.stop();
+                for track in existing_stream.getTracks() {
+                    track.stop();
                 }
                 web.window.__legoScannerStream = None;
             }
@@ -55,28 +46,9 @@ def:pub CountdownApp() -> JsxElement {
 
             stream = None;
             try {
-                stream = await media_devices.getUserMedia({"video": {"width": {"ideal": 1280}, "height": {"ideal": 720}, "facingMode": "user"}, "audio": False});
+                stream = await media_devices.getUserMedia({"video": {"facingMode": "user", "width": {"ideal": 1280}, "height": {"ideal": 720}}, "audio": False});
             } except Exception {
-                try {
-                    stream = await media_devices.getUserMedia({"video": True, "audio": False});
-                } except Exception {
-                    devices = await media_devices.enumerateDevices();
-                    selected_device_id = "";
-                    for device in devices {
-                        if device.kind == "videoinput" {
-                            selected_device_id = str(device.deviceId or "");
-                            if selected_device_id != "" {
-                                break;
-                            }
-                        }
-                    }
-                    if selected_device_id == "" {
-                        permission = "Unavailable";
-                        status = "No webcam device detected";
-                        return;
-                    }
-                    stream = await media_devices.getUserMedia({"video": {"deviceId": {"exact": selected_device_id}}, "audio": False});
-                }
+                stream = await media_devices.getUserMedia({"video": True, "audio": False});
             }
 
             if not stream {
@@ -85,25 +57,17 @@ def:pub CountdownApp() -> JsxElement {
                 return;
             }
 
-            tracks = stream.getVideoTracks();
-            if not tracks or len(tracks) == 0 {
-                permission = "Unavailable";
-                status = "Webcam stream has no video track";
-                return;
-            }
-
             video.srcObject = stream;
             web.window.__legoScannerStream = stream;
-
             permission = "Granted";
-            status = "Webcam stream connected";
+            status = "Webcam connected";
 
             try {
                 await video.play();
-                status = "Webcam active";
             } except Exception {
-                status = "Webcam connected; tap Start webcam again if preview is still paused";
             }
+
+            status = "Webcam active";
         } except Exception as e {
             permission = "Denied";
             status = "Unable to start webcam: " + str(e);
@@ -113,8 +77,7 @@ def:pub CountdownApp() -> JsxElement {
     def stop_camera() -> None {
         stream = web.window.__legoScannerStream;
         if stream {
-            tracks = stream.getTracks();
-            for track in tracks {
+            for track in stream.getTracks() {
                 track.stop();
             }
         }
