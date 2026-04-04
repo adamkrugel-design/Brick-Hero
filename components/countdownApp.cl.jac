@@ -16,6 +16,7 @@ def:pub CountdownApp() -> JsxElement {
     has active_years_start: str = "";
     has active_years_end: str = "";
     has active_years_source: str = "BrickLink";
+    has active_release_range: str = "Unknown";
     has active_color: str = "Unknown";
     has active_color_source: str = "Brickognize";
     has active_bricklink_url: str = "";
@@ -126,18 +127,28 @@ def:pub CountdownApp() -> JsxElement {
             if result and result["success"] {
                 match_info = result["active_match"] or {};
                 telemetry = result["telemetry"] or {};
-                years_info = match_info["years_released"] or {};
-                color_info = match_info["color"] or {};
-                active_name = str(match_info["name"] or "Unknown part");
-                active_confidence = str(match_info["confidence"] or "0%");
-                active_notes = str(match_info["notes"] or "Recognition complete.");
-                active_part_id = str(match_info["specific_part_number"] or match_info["part_id"] or "—");
-                active_years = str(years_info["label"] or match_info["years_released_label"] or "Unknown");
-                active_years_start = str(years_info["start"] or match_info["years_released_start"] or "");
-                active_years_end = str(years_info["end"] or match_info["years_released_end"] or "");
-                active_years_source = str(years_info["source"] or match_info["years_released_source"] or "BrickLink");
-                active_color = str(color_info["label"] or match_info["color_label"] or match_info["detected_color"] or "Unknown");
-                active_color_source = str(color_info["source"] or match_info["color_source"] or "Brickognize");
+                years_info = (match_info and match_info["years_released"]) or {};
+                color_info = (match_info and match_info["color"]) or {};
+                active_name = str((match_info and match_info["name"]) or "Unknown part");
+                active_confidence = str((match_info and match_info["confidence"]) or "0%");
+                active_notes = str((match_info and match_info["notes"]) or "Recognition complete.");
+                active_part_id = str((match_info and match_info["specific_part_number"]) or (match_info and match_info["part_id"]) or "—");
+                years_label = (years_info and years_info["label"]) or (match_info and match_info["years_released_label"]) or "Unknown";
+                years_start = (years_info and years_info["start"]) or (match_info and match_info["years_released_start"]) or "";
+                years_end = (years_info and years_info["end"]) or (match_info and match_info["years_released_end"]) or "";
+                active_years = str(years_label);
+                active_years_start = str(years_start);
+                active_years_end = str(years_end);
+                if years_start != "" and years_end != "" {
+                    active_release_range = str((years_start == years_end) and years_start or (str(years_start) + " → " + str(years_end)));
+                } elif years_start != "" {
+                    active_release_range = str(years_start);
+                } else {
+                    active_release_range = "Unknown";
+                }
+                active_years_source = str((years_info and years_info["source"]) or (match_info and match_info["years_released_source"]) or "BrickLink");
+                active_color = str((color_info and color_info["label"]) or (match_info and match_info["color_label"]) or (match_info and match_info["detected_color"]) or "Unknown");
+                active_color_source = str((color_info and color_info["source"]) or (match_info and match_info["color_source"]) or "Brickognize");
                 active_bricklink_url = str(match_info["bricklink_url"] or "");
                 provider = str(telemetry["provider"] or "Brickognize");
                 payload_text = str(telemetry["mime_type"] or "image/png") + " · " + str(telemetry["bytes"] or 0) + " bytes";
@@ -228,30 +239,45 @@ def:pub CountdownApp() -> JsxElement {
                             <div>
                                 <p className="text-xs uppercase tracking-wide text-muted-foreground">Detected part</p>
                                 <h3 className="mt-1 text-lg font-semibold text-foreground">{active_name}</h3>
+                                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                                    <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+                                        <p className="text-xs uppercase tracking-wide">Detected color</p>
+                                        <p className="mt-1 text-base font-semibold text-foreground">{str(active_color)}</p>
+                                        <p className="mt-1 text-xs">Source: {active_color_source}</p>
+                                    </div>
+                                    <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+                                        <p className="text-xs uppercase tracking-wide">Years released</p>
+                                        <p className="mt-1 text-base font-semibold text-foreground">{str(active_years)}</p>
+                                        <p className="mt-1 text-xs">Source: {active_years_source}</p>
+                                    </div>
+                                </div>
                             </div>
                             <span className="rounded-full bg-card px-3 py-1 text-sm font-medium text-foreground">{active_confidence}</span>
                         </div>
                         <p className="mt-3 text-sm leading-6 text-muted-foreground">{active_notes}</p>
-                        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Part ID</p>
                                 <p className="mt-1 text-base font-semibold text-foreground">{str(active_part_id)}</p>
                                 <p className="mt-1 text-xs">Catalog reference</p>
                             </div>
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-                                <p className="font-medium text-foreground">Years released</p>
-                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_years)}</p>
-                                <p className="mt-1 text-xs">Source: {active_years_source}</p>
-                            </div>
-                            <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Release range</p>
-                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_years_start != "" and (active_years_start + " → " + active_years_end) or "Unknown")}</p>
+                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_release_range)}</p>
                                 <p className="mt-1 text-xs">Start and end years</p>
                             </div>
-                            <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
-                                <p className="font-medium text-foreground">Detected color</p>
-                                <p className="mt-1 text-base font-semibold text-foreground">{str(active_color)}</p>
-                                <p className="mt-1 text-xs">Source: {active_color_source}</p>
+                        </div>
+                        <div className="mt-4 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
+                            <p className="font-medium text-foreground">Detected part details</p>
+                            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                                <div>
+                                    <p className="text-xs uppercase tracking-wide">BrickLink years released</p>
+                                    <p className="mt-1 text-base font-semibold text-foreground">{str(active_years)}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs uppercase tracking-wide">Detected color</p>
+                                    <p className="mt-1 text-base font-semibold text-foreground">{str(active_color)}</p>
+                                </div>
                             </div>
                         </div>
                         <div className="mt-4 rounded-2xl border border-border bg-card p-4">

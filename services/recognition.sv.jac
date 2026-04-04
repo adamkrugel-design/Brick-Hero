@@ -228,19 +228,33 @@ def parse_years_released(page_text: str) -> dict {
     section = section.split("<br", 1)[0];
     section = section.replace("&nbsp;", " ");
     section = section.replace("</span>", "");
-    if ">" in section {
-        section = section.split(">", 1)[1];
-    }
+    section = section.replace("</div>", "");
+    section = section.replace("<span id=\"yearReleasedSec\">", "");
     section = section.strip();
 
     if not section {
         return {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"};
     }
 
-    if "-" in section {
-        parts = section.split("-", 1);
-        start_year = parts[0].strip();
-        end_year = parts[1].strip();
+    year_tokens = [];
+    current = "";
+    for ch in section {
+        if ch >= "0" and ch <= "9" {
+            current = current + ch;
+        } else {
+            if len(current) == 4 {
+                year_tokens.append(current);
+            }
+            current = "";
+        }
+    }
+    if len(current) == 4 {
+        year_tokens.append(current);
+    }
+
+    if len(year_tokens) >= 2 {
+        start_year = year_tokens[0];
+        end_year = year_tokens[1];
         return {
             "label": start_year + "–" + end_year,
             "start": start_year,
@@ -249,7 +263,11 @@ def parse_years_released(page_text: str) -> dict {
         };
     }
 
-    return {"label": section, "start": section, "end": section, "source": "BrickLink"};
+    if len(year_tokens) == 1 {
+        return {"label": year_tokens[0], "start": year_tokens[0], "end": year_tokens[0], "source": "BrickLink"};
+    }
+
+    return {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"};
 }
 
 
