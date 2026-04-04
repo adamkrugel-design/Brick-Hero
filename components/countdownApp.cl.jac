@@ -17,6 +17,7 @@ def:pub CountdownApp() -> JsxElement {
     has active_release_range: str = "Unknown";
     has active_color: str = "Unknown";
     has active_color_source: str = "BrickLink";
+    has active_color_sample: str = "";
     has active_bricklink_url: str = "";
     has provider: str = "Brickognize";
     has payload_text: str = "image/png · 0 bytes";
@@ -147,6 +148,7 @@ def:pub CountdownApp() -> JsxElement {
                 active_years_source = str((years_info and years_info["source"]) or (match_info and match_info["years_released_source"]) or "BrickLink");
                 active_color = str((color_info and color_info["label"]) or (match_info and match_info["color_label"]) or (match_info and match_info["detected_color"]) or "Unknown");
                 active_color_source = str((color_info and color_info["source"]) or (match_info and match_info["color_source"]) or "BrickLink");
+                active_color_sample = str((color_info and color_info["rgb"]) or "");
                 active_bricklink_url = str(match_info["bricklink_url"] or "");
                 provider = str(telemetry["provider"] or "Brickognize");
                 payload_text = str(telemetry["mime_type"] or "image/png") + " · " + str(telemetry["bytes"] or 0) + " bytes";
@@ -202,7 +204,7 @@ def:pub CountdownApp() -> JsxElement {
                     <div className="rounded-full border border-slate-600 bg-slate-900/80 px-3 py-1 text-sm font-medium text-slate-100">{permission}</div>
                 </div>
 
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition. After the piece is identified, BrickLink is used to look up the color and release-year details.</p>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition. After the piece is identified, BrickLink is used to look up the color and release-year details, with an image-based LEGO color fallback when BrickLink cannot provide a clean color label.</p>
 
                 <div className="mt-6 overflow-hidden rounded-2xl border border-slate-700 bg-black shadow-inner shadow-black/30">
                     <div className="relative min-h-80 bg-neutral-950">
@@ -247,6 +249,7 @@ def:pub CountdownApp() -> JsxElement {
                                 </div>
                                 <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-400">
                                     <p>Color source: <span className="font-medium text-slate-100">{active_color_source}</span></p>
+                                    {active_color_sample != "" and (<p>Sample RGB: <span className="font-medium text-slate-100">{active_color_sample}</span></p>)}
                                     <p>Years source: <span className="font-medium text-slate-100">{active_years_source}</span></p>
                                 </div>
                             </div>
