@@ -1,6 +1,4 @@
 sv import from ..services.recognition { recognize_lego_frame }
-sv import from ..services.recognition { recognize_lego_frame }
-
 
 def:pub CountdownApp() -> JsxElement {
     has analyzing: bool = False;
@@ -209,11 +207,9 @@ def:pub CountdownApp() -> JsxElement {
                 <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-black">
                     <div className="relative min-h-80 bg-neutral-950">
                         <video id="scanner-video" className="h-full min-h-80 w-full object-cover" autoPlay={True} muted={True} playsInline={True}></video>
-                        {(not camera_active) and (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/60 px-6 text-center text-sm text-white/80">
-                                Start the webcam to preview the live camera feed.
-                            </div>
-                        )}
+                        {not camera_active and (<div className="absolute inset-0 flex items-center justify-center bg-black/60 px-6 text-center text-sm text-white/80">
+                            Start the webcam to preview the live camera feed.
+                        </div>)}
                     </div>
                 </div>
 
@@ -289,11 +285,9 @@ def:pub CountdownApp() -> JsxElement {
                                     <p className="mt-1">BrickLink lookup: <span className="font-semibold text-foreground">{active_bricklink_url != "" and "Available" or "Unavailable"}</span></p>
                                 </div>
                             </div>
-                            {(active_bricklink_url != "") and (
-                                <a href={active_bricklink_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl border border-border bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-hover">
-                                    Open on BrickLink
-                                </a>
-                            )}
+                            {active_bricklink_url != "" and (<a href={active_bricklink_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl border border-border bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-hover">
+                                Open on BrickLink
+                            </a>)}
                         </div>
                     </div>
                 </div>
@@ -302,8 +296,8 @@ def:pub CountdownApp() -> JsxElement {
                     <p className="text-sm font-medium text-muted-foreground">Snapshot</p>
                     <h2 className="mt-1 text-2xl font-semibold text-foreground">Latest capture</h2>
                     <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-muted">
-                        {(captured_frame != "") and (<img src={captured_frame} alt="Captured LEGO frame" className="h-64 w-full object-cover" />)}
-                        {(captured_frame == "") and (<div className="flex h-64 items-center justify-center px-6 text-center text-sm text-muted-foreground">No snapshot captured yet.</div>)}
+                        {captured_frame != "" and (<img src={captured_frame} alt="Captured LEGO frame" className="h-64 w-full object-cover" />)}
+                        {captured_frame == "" and (<div className="flex h-64 items-center justify-center px-6 text-center text-sm text-muted-foreground">No snapshot captured yet.</div>)}
                     </div>
                     <div className="mt-4 grid gap-3">
                         <div className="rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
