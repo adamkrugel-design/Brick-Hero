@@ -273,29 +273,73 @@ def parse_years_released(page_text: str) -> dict {
 
 def bricklink_color_palette() -> list {
     return [
-        {"label": "Black", "r": 27, "g": 42, "b": 52},
-        {"label": "White", "r": 242, "g": 243, "b": 242},
-        {"label": "Light Bluish Gray", "r": 160, "g": 165, "b": 169},
-        {"label": "Dark Bluish Gray", "r": 99, "g": 95, "b": 98},
-        {"label": "Red", "r": 196, "g": 40, "b": 27},
-        {"label": "Blue", "r": 13, "g": 105, "b": 171},
-        {"label": "Green", "r": 40, "g": 127, "b": 70},
-        {"label": "Dark Green", "r": 40, "g": 70, "b": 45},
-        {"label": "Yellow", "r": 245, "g": 205, "b": 47},
-        {"label": "Tan", "r": 228, "g": 205, "b": 158},
-        {"label": "Dark Tan", "r": 149, "g": 138, "b": 115},
-        {"label": "Brown", "r": 124, "g": 92, "b": 70},
-        {"label": "Reddish Brown", "r": 105, "g": 64, "b": 40},
-        {"label": "Orange", "r": 218, "g": 133, "b": 65},
-        {"label": "Dark Orange", "r": 160, "g": 95, "b": 53},
-        {"label": "Trans-Clear", "r": 236, "g": 236, "b": 236},
+        {"label": "Black", "r": 27, "g": 42, "b": 52, "family": "neutral"},
+        {"label": "White", "r": 242, "g": 243, "b": 242, "family": "neutral"},
+        {"label": "Light Bluish Gray", "r": 160, "g": 165, "b": 169, "family": "neutral"},
+        {"label": "Dark Bluish Gray", "r": 99, "g": 95, "b": 98, "family": "neutral"},
+        {"label": "Red", "r": 196, "g": 40, "b": 27, "family": "red"},
+        {"label": "Dark Red", "r": 123, "g": 46, "b": 47, "family": "red"},
+        {"label": "Blue", "r": 13, "g": 105, "b": 171, "family": "blue"},
+        {"label": "Dark Blue", "r": 0, "g": 32, "b": 96, "family": "blue"},
+        {"label": "Green", "r": 40, "g": 127, "b": 70, "family": "green"},
+        {"label": "Dark Green", "r": 40, "g": 70, "b": 45, "family": "green"},
+        {"label": "Lime", "r": 168, "g": 189, "b": 61, "family": "green"},
+        {"label": "Yellow", "r": 245, "g": 205, "b": 47, "family": "yellow"},
+        {"label": "Tan", "r": 228, "g": 205, "b": 158, "family": "tan"},
+        {"label": "Dark Tan", "r": 149, "g": 138, "b": 115, "family": "tan"},
+        {"label": "Brown", "r": 124, "g": 92, "b": 70, "family": "brown"},
+        {"label": "Reddish Brown", "r": 105, "g": 64, "b": 40, "family": "brown"},
+        {"label": "Orange", "r": 218, "g": 133, "b": 65, "family": "orange"},
+        {"label": "Dark Orange", "r": 160, "g": 95, "b": 53, "family": "orange"},
+        {"label": "Pink", "r": 255, "g": 152, "b": 220, "family": "pink"},
+        {"label": "Purple", "r": 123, "g": 47, "b": 123, "family": "purple"},
+        {"label": "Trans-Clear", "r": 236, "g": 236, "b": 236, "family": "neutral"},
     ];
 }
 
 
-def nearest_bricklink_color(avg_red: int, avg_green: int, avg_blue: int) -> dict {
+def color_family_from_text(text: str) -> str {
+    lowered = str(text).lower();
+    if not lowered {
+        return "";
+    }
+    if "light bluish gray" in lowered or "dark bluish gray" in lowered or "grey" in lowered or "gray" in lowered or "black" in lowered or "white" in lowered or "clear" in lowered {
+        return "neutral";
+    }
+    if "dark red" in lowered or "red" in lowered {
+        return "red";
+    }
+    if "dark blue" in lowered or "blue" in lowered {
+        return "blue";
+    }
+    if "dark green" in lowered or "lime" in lowered or "green" in lowered {
+        return "green";
+    }
+    if "yellow" in lowered {
+        return "yellow";
+    }
+    if "dark tan" in lowered or "tan" in lowered or "beige" in lowered {
+        return "tan";
+    }
+    if "reddish brown" in lowered or "brown" in lowered {
+        return "brown";
+    }
+    if "dark orange" in lowered or "orange" in lowered {
+        return "orange";
+    }
+    if "pink" in lowered {
+        return "pink";
+    }
+    if "purple" in lowered {
+        return "purple";
+    }
+    return "";
+}
+
+
+def nearest_bricklink_color(avg_red: int, avg_green: int, avg_blue: int, preferred_family: str = "") -> dict {
     palette = bricklink_color_palette();
-    best_match = {"label": "Unknown", "r": avg_red, "g": avg_green, "b": avg_blue};
+    best_match = {"label": "Unknown", "r": avg_red, "g": avg_green, "b": avg_blue, "family": preferred_family};
     best_distance = -1;
     channel_max = avg_red;
     if avg_green > channel_max {
@@ -312,6 +356,7 @@ def nearest_bricklink_color(avg_red: int, avg_green: int, avg_blue: int) -> dict
         channel_min = avg_blue;
     }
     saturation = channel_max - channel_min;
+    brightness = int(round((avg_red + avg_green + avg_blue) / 3));
     for swatch in palette {
         distance = ((avg_red - swatch["r"]) * (avg_red - swatch["r"])) + ((avg_green - swatch["g"]) * (avg_green - swatch["g"])) + ((avg_blue - swatch["b"]) * (avg_blue - swatch["b"]));
         swatch_max = swatch["r"];
@@ -329,11 +374,41 @@ def nearest_bricklink_color(avg_red: int, avg_green: int, avg_blue: int) -> dict
             swatch_min = swatch["b"];
         }
         swatch_saturation = swatch_max - swatch_min;
-        if saturation >= 28 and swatch_saturation < 18 {
+        swatch_brightness = int(round((swatch["r"] + swatch["g"] + swatch["b"]) / 3));
+        brightness_gap = brightness - swatch_brightness;
+        if brightness_gap < 0 {
+            brightness_gap = 0 - brightness_gap;
+        }
+        distance = distance + (brightness_gap * 12);
+        if saturation >= 45 and swatch_saturation < 20 {
+            distance = distance + 22000;
+        }
+        if saturation >= 32 and swatch_saturation < 30 {
             distance = distance + 12000;
         }
-        if saturation <= 18 and swatch_saturation > 70 {
-            distance = distance + 5000;
+        if saturation <= 14 and swatch_saturation > 85 {
+            distance = distance + 9000;
+        }
+        if brightness <= 55 and swatch["label"] == "White" {
+            distance = distance + 18000;
+        }
+        if brightness >= 220 and swatch["label"] == "Black" {
+            distance = distance + 18000;
+        }
+        if saturation >= 26 and (swatch["label"] == "Light Bluish Gray" or swatch["label"] == "Dark Bluish Gray") {
+            distance = distance + 16000;
+        }
+        if preferred_family != "" and swatch["family"] != preferred_family {
+            distance = distance + 9000;
+        }
+        if avg_red >= avg_green + 18 and avg_red >= avg_blue + 18 and (swatch["family"] == "blue" or swatch["family"] == "green") {
+            distance = distance + 9000;
+        }
+        if avg_blue >= avg_red + 18 and avg_blue >= avg_green + 18 and (swatch["family"] == "red" or swatch["family"] == "orange" or swatch["family"] == "brown") {
+            distance = distance + 9000;
+        }
+        if avg_green >= avg_red + 18 and avg_green >= avg_blue + 18 and (swatch["family"] == "red" or swatch["family"] == "blue" or swatch["family"] == "brown") {
+            distance = distance + 7000;
         }
         if best_distance < 0 or distance < best_distance {
             best_distance = distance;
@@ -344,7 +419,7 @@ def nearest_bricklink_color(avg_red: int, avg_green: int, avg_blue: int) -> dict
 }
 
 
-def estimate_image_color(raw: bytes) -> dict {
+def estimate_image_color(raw: bytes, preferred_family: str = "") -> dict {
     if not raw {
         return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
     }
@@ -381,24 +456,13 @@ def estimate_image_color(raw: bytes) -> dict {
         if third < channel_min {
             channel_min = third;
         }
-        if channel_max - channel_min > 10 {
+        if channel_max - channel_min > 18 {
             red_total = red_total + first;
             green_total = green_total + second;
             blue_total = blue_total + third;
             pixel_count = pixel_count + 1;
         }
         idx = idx + stride;
-    }
-
-    if pixel_count == 0 {
-        idx = 8;
-        while idx + 2 < sample_limit {
-            red_total = red_total + int(raw[idx]);
-            green_total = green_total + int(raw[idx + 1]);
-            blue_total = blue_total + int(raw[idx + 2]);
-            pixel_count = pixel_count + 1;
-            idx = idx + stride;
-        }
     }
 
     if pixel_count == 0 {
@@ -409,7 +473,7 @@ def estimate_image_color(raw: bytes) -> dict {
     avg_green = int(round(green_total / pixel_count));
     avg_blue = int(round(blue_total / pixel_count));
     rgb_text = str(avg_red) + ", " + str(avg_green) + ", " + str(avg_blue);
-    matched = nearest_bricklink_color(avg_red, avg_green, avg_blue);
+    matched = nearest_bricklink_color(avg_red, avg_green, avg_blue, preferred_family);
 
     return {
         "label": str(matched["label"]),
@@ -522,15 +586,21 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
     bricklink_metadata = fetch_bricklink_metadata(best_part_id, best_bricklink_url);
     years_released = safe_get(bricklink_metadata, "years_released", {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"});
     bricklink_color = safe_get(bricklink_metadata, "color", {"label": "Unknown", "source": "BrickLink"});
-    fallback_color = estimate_image_color(raw);
-    best_color = fallback_color;
     bricklink_color_label = str(safe_get(bricklink_color, "label", "Unknown"));
+    preferred_family = color_family_from_text(best_name + " " + best_notes + " " + bricklink_color_label);
+    fallback_color = estimate_image_color(raw, preferred_family);
+    best_color = fallback_color;
     if bricklink_color_label and bricklink_color_label != "Unknown" and bricklink_color_label != "Unavailable" {
         best_color["bricklink_variant"] = bricklink_color_label;
     } else {
         best_color["bricklink_variant"] = str(safe_get(fallback_color, "bricklink_match", safe_get(fallback_color, "label", "Unknown")));
     }
     best_color["label"] = str(safe_get(best_color, "bricklink_variant", safe_get(best_color, "label", "Unknown")));
+    if str(safe_get(best_color, "label", "Unknown")) == "Unknown" and bricklink_color_label and bricklink_color_label != "Unavailable" {
+        best_color["label"] = bricklink_color_label;
+        best_color["source"] = "BrickLink";
+        best_color["rgb"] = "";
+    }
 
     return {
         "success": True,
