@@ -315,3 +315,4 @@ relative min-h-80 bg-neutral-950">
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 6:07:26 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+6:21:25 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
