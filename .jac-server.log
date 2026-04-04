@@ -49,15 +49,13 @@
 ✖ Error: error[E0002]: Missing ';'
   --> /root/.jac-ide/pro[HMR] Reloaded: ./main.jac
 ✔ Recompiled: ./main.jac -> main.js
-.jac:53:32
-   51 |             permission = "Granted";
-   52 |             status = "Webcam active";
-   53 |         } catch Exception as e {
-      |                                ^
-   54 |             permission = "Denied";
-   55 |             status = "Unable to start webcam: " + str(e);
-✖ Error: error[E0002]: Missing '}'
-  --> /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:54:24
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+rojects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:54:24
    52 |             status = "Webcam active";
    53 |         } catch Exception as e {
    54 |             permission = "Denied";
@@ -215,11 +213,13 @@
   189 |                             {(captured_frame == "") and (<div className="flex h-64 items-center justify-center px-6 text-center text-sm text-muted-foreground">No snapshot captured yet.</div>)}
       |                                                                                                                                                 [HMR] Reloaded: ./main.jac
 ✔ Recompiled: ./main.jac -> main.js
-                </div>
-  191 |                         <div className="mt-4 grid gap-3">
-✖ Error: error[E0005]: Unexpected token '}'
-  --> /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:194:62
-  192 |                             <div className="rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+d-foreground">
   193 |                                 <p className="font-medium text-foreground">Provider</p>
   194 |                                 <p className="mt-1">{provider}</p>
       |                                                              ^
@@ -252,18 +252,11 @@
 ✖ Error: error[E0005]: Une[HMR] Reloaded: ./main.jac
 ✔ Recompiled: ./main.jac -> main.js
 5:02:59 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
-edf7a27/prj_1775316932254/main.jac:17:9
-   15 | 
-   16 |     async def start_camera() -> None {
-   17 |         try {
-      |         ^^^^^
-   18 |             media_devices = web.navigator.mediaDevices;
-   19 |             if not media_devices {
-✖ Error: error[E0040]: try statement requires at least one except or finally block
-  --> /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:43:13
-   41 |             video.autoplay = True;
-   42 |             video.playsInline = True;
-   43 |             try {
-      |             ^^^^^
-   44 |                 stream = await media_devices.getUserMedia({"video": {"width": {"ideal": 1280}, "height": {"ideal": 720}}, "audio": False});
-   45 |             } catch Exception {
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+5:06:51 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+5:07:41 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.

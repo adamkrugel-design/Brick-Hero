@@ -12,21 +12,58 @@ def:pub CountdownApp() -> JsxElement {
     has payload_text: str = "image/png · 0 bytes";
     has candidate_text: str = "0 matches returned";
 
+    can with entry {
+        status = "Camera ready";
+        permission = "Idle";
+    }
+
     async def start_camera() -> None {
         try {
+            permission = "Requesting";
+            status = "Requesting webcam access...";
             media_devices = web.navigator.mediaDevices;
             if not media_devices {
                 permission = "Unavailable";
                 status = "This browser does not expose mediaDevices";
                 return;
             }
-            video = web.document.getElementById("scanner-video");
-            stream = await media_devices.getUserMedia({"video": True, "audio": False});
-            if video {
-                video.srcObject = stream;
-                await video.play();
+
+            existing_stream = web.window.__legoScannerStream;
+            if existing_stream {
+                existing_tracks = existing_stream.getTracks();
+                for existing_track in existing_tracks {
+                    existing_track.stop();
+                }
+                web.window.__legoScannerStream = None;
             }
+
+            video = web.document.getElementById("scanner-video");
+            if not video {
+                permission = "Unavailable";
+                status = "Video element not found";
+                return;
+            }
+
+            video.srcObject = None;
+            video.muted = True;
+            video.autoplay = True;
+            video.playsInline = True;
+
+            stream = None;
+            try {
+                stream = await media_devices.getUserMedia({"video": {"width": {"ideal": 1280}, "height": {"ideal": 720}}, "audio": False});
+            } except Exception {
+                stream = await media_devices.getUserMedia({"video": True, "audio": False});
+            }
+
+            video.srcObject = stream;
             web.window.__legoScannerStream = stream;
+
+            try {
+                await video.play();
+            } except Exception {
+            }
+
             permission = "Granted";
             status = "Webcam active";
         } except Exception as e {
