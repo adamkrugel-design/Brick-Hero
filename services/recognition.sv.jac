@@ -1,7 +1,5 @@
 import from base64 { b64decode }
 import from requests { get, post }
-import from io { BytesIO }
-import from PIL import Image
 
 
 def parse_data_url(frame_data: str) -> tuple[str, bytes] {
@@ -175,48 +173,46 @@ def item_bricklink_url(item: any, part_id: str) -> str {
 }
 
 
+def strip_tags(text: str) -> str {
+    cleaned = "";
+    inside_tag = False;
+    for ch in text {
+        if ch == "<" {
+            inside_tag = True;
+        } elif ch == ">" {
+            inside_tag = False;
+        } elif not inside_tag {
+            cleaned = cleaned + ch;
+        }
+    }
+    cleaned = cleaned.replace("&nbsp;", " ");
+    cleaned = cleaned.replace("&amp;", "&");
+    cleaned = cleaned.replace("\n", " ");
+    cleaned = cleaned.replace("\r", " ");
+    cleaned = cleaned.replace("\t", " ");
+    while "  " in cleaned {
+        cleaned = cleaned.replace("  ", " ");
+    }
+    return cleaned.strip();
+}
+
+
 def parse_bricklink_color(page_text: str) -> dict {
     if not page_text {
         return {"label": "Unknown", "source": "BrickLink"};
     }
 
-    markers = ["Color:", "Known Color:"];
-    for marker in markers {
+    for marker in ["Color:", "Known Color:"] {
         if marker not in page_text {
             continue;
         }
         section = page_text.split(marker, 1)[1];
-        section = section.split("Years Released:", 1)[0];
-        section = section.split("Year Released:", 1)[0];
-        section = section.split("Weight:", 1)[0];
-        section = section.split("<br", 1)[0];
-        section = section.split("</td>", 1)[0];
-        section = section.replace("&nbsp;", " ");
-        section = section.replace("&amp;", "&");
-
-        cleaned = "";
-        inside_tag = False;
-        for ch in section {
-            if ch == "<" {
-                inside_tag = True;
-                continue;
-            }
-            if ch == ">" {
-                inside_tag = False;
-                continue;
-            }
-            if not inside_tag {
-                cleaned = cleaned + ch;
+        for stop in ["Years Released:", "Year Released:", "Weight:", "Item Dim", "<br", "</td>"] {
+            if stop in section {
+                section = section.split(stop, 1)[0];
             }
         }
-
-        cleaned = cleaned.replace("\n", " ");
-        cleaned = cleaned.replace("\r", " ");
-        while "  " in cleaned {
-            cleaned = cleaned.replace("  ", " ");
-        }
-        cleaned = cleaned.strip();
-
+        cleaned = strip_tags(section);
         if cleaned and len(cleaned) <= 40 and "function" not in cleaned.lower() and "{" not in cleaned and "}" not in cleaned {
             return {"label": cleaned, "source": "BrickLink"};
         }
@@ -240,16 +236,12 @@ def parse_years_released(page_text: str) -> dict {
     }
 
     section = page_text.split(marker, 1)[1];
-    section = section.split("<br", 1)[0];
-    section = section.replace("&nbsp;", " ");
-    section = section.replace("</span>", "");
-    section = section.replace("</div>", "");
-    section = section.replace("<span id=\"yearReleasedSec\">", "");
-    section = section.strip();
-
-    if not section {
-        return {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"};
+    for stop in ["Weight:", "Item Dim", "<br", "</td>"] {
+        if stop in section {
+            section = section.split(stop, 1)[0];
+        }
     }
+    section = strip_tags(section);
 
     year_tokens = [];
     current = "";
@@ -270,18 +262,11 @@ def parse_years_released(page_text: str) -> dict {
     if len(year_tokens) >= 2 {
         start_year = year_tokens[0];
         end_year = year_tokens[1];
-        return {
-            "label": start_year + "–" + end_year,
-            "start": start_year,
-            "end": end_year,
-            "source": "BrickLink",
-        };
+        return {"label": start_year + "–" + end_year, "start": start_year, "end": end_year, "source": "BrickLink"};
     }
-
     if len(year_tokens) == 1 {
         return {"label": year_tokens[0], "start": year_tokens[0], "end": year_tokens[0], "source": "BrickLink"};
     }
-
     return {"label": "Unknown", "start": "", "end": "", "source": "BrickLink"};
 }
 
@@ -290,114 +275,7 @@ def estimate_image_color(raw: bytes) -> dict {
     if not raw {
         return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
     }
-
-    palette = [
-        {"label": "Black", "rgb": (27, 42, 52)},
-        {"label": "White", "rgb": (242, 243, 242)},
-        {"label": "Light Bluish Gray", "rgb": (160, 165, 169)},
-        {"label": "Dark Bluish Gray", "rgb": (99, 95, 98)},
-        {"label": "Red", "rgb": (196, 40, 27)},
-        {"label": "Dark Red", "rgb": (114, 14, 15)},
-        {"label": "Blue", "rgb": (13, 105, 171)},
-        {"label": "Dark Blue", "rgb": (0, 32, 96)},
-        {"label": "Yellow", "rgb": (245, 205, 47)},
-        {"label": "Bright Light Orange", "rgb": (248, 187, 61)},
-        {"label": "Orange", "rgb": (218, 133, 65)},
-        {"label": "Green", "rgb": (40, 127, 70)},
-        {"label": "Dark Green", "rgb": (24, 70, 50)},
-        {"label": "Tan", "rgb": (228, 205, 158)},
-        {"label": "Dark Tan", "rgb": (149, 138, 115)},
-        {"label": "Reddish Brown", "rgb": (105, 64, 40)},
-        {"label": "Brown", "rgb": (124, 92, 70)},
-        {"label": "Pink", "rgb": (255, 152, 220)},
-        {"label": "Purple", "rgb": (123, 47, 123)},
-        {"label": "Lavender", "rgb": (188, 166, 208)},
-        {"label": "Sand Green", "rgb": (120, 144, 130)},
-        {"label": "Sand Blue", "rgb": (96, 116, 161)},
-        {"label": "Trans-Clear", "rgb": (236, 236, 236)},
-    ];
-
-    try {
-        image = Image.open(BytesIO(raw)).convert("RGB");
-        image.thumbnail((96, 96));
-        width = image.width;
-        height = image.height;
-        if width <= 0 or height <= 0 {
-            return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
-        }
-
-        left = int(width * 0.2);
-        top = int(height * 0.2);
-        right = int(width * 0.8);
-        bottom = int(height * 0.8);
-        if right <= left or bottom <= top {
-            left = 0;
-            top = 0;
-            right = width;
-            bottom = height;
-        }
-
-        total_r = 0;
-        total_g = 0;
-        total_b = 0;
-        count = 0;
-        for y in range(top, bottom) {
-            for x in range(left, right) {
-                pixel = image.getpixel((x, y));
-                r = int(pixel[0]);
-                g = int(pixel[1]);
-                b = int(pixel[2]);
-                brightness = (r + g + b) / 3;
-                spread = max(r, g, b) - min(r, g, b);
-                if brightness > 245 and spread < 12 {
-                    continue;
-                }
-                total_r = total_r + r;
-                total_g = total_g + g;
-                total_b = total_b + b;
-                count = count + 1;
-            }
-        }
-
-        if count == 0 {
-            for y in range(height) {
-                for x in range(width) {
-                    pixel = image.getpixel((x, y));
-                    total_r = total_r + int(pixel[0]);
-                    total_g = total_g + int(pixel[1]);
-                    total_b = total_b + int(pixel[2]);
-                    count = count + 1;
-                }
-            }
-        }
-
-        if count == 0 {
-            return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
-        }
-
-        avg_r = int(round(total_r / count));
-        avg_g = int(round(total_g / count));
-        avg_b = int(round(total_b / count));
-
-        best_label = "Unknown";
-        best_distance = None;
-        for entry in palette {
-            target = entry["rgb"];
-            distance = ((avg_r - target[0]) * (avg_r - target[0])) + ((avg_g - target[1]) * (avg_g - target[1])) + ((avg_b - target[2]) * (avg_b - target[2]));
-            if best_distance == None or distance < best_distance {
-                best_distance = distance;
-                best_label = entry["label"];
-            }
-        }
-
-        return {
-            "label": best_label,
-            "source": "Image fallback",
-            "rgb": str(avg_r) + ", " + str(avg_g) + ", " + str(avg_b),
-        };
-    } except Exception as e {
-        return {"label": "Unknown", "source": "Image fallback", "rgb": "", "error": str(e)};
-    }
+    return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
 }
 
 
@@ -425,35 +303,15 @@ def fetch_bricklink_metadata(part_id: str, bricklink_url: str) -> dict {
         );
     } except Exception as e {
         return {
-            "years_released": {
-                "label": "Unavailable",
-                "start": "",
-                "end": "",
-                "source": "BrickLink",
-                "error": "BrickLink lookup failed: " + str(e),
-            },
-            "color": {
-                "label": "Unavailable",
-                "source": "BrickLink",
-                "error": "BrickLink lookup failed: " + str(e),
-            },
+            "years_released": {"label": "Unavailable", "start": "", "end": "", "source": "BrickLink", "error": "BrickLink lookup failed: " + str(e)},
+            "color": {"label": "Unavailable", "source": "BrickLink", "error": "BrickLink lookup failed: " + str(e)},
         };
     }
 
     if response.status_code < 200 or response.status_code >= 300 {
         return {
-            "years_released": {
-                "label": "Unavailable",
-                "start": "",
-                "end": "",
-                "source": "BrickLink",
-                "error": "BrickLink returned status " + str(response.status_code),
-            },
-            "color": {
-                "label": "Unavailable",
-                "source": "BrickLink",
-                "error": "BrickLink returned status " + str(response.status_code),
-            },
+            "years_released": {"label": "Unavailable", "start": "", "end": "", "source": "BrickLink", "error": "BrickLink returned status " + str(response.status_code)},
+            "color": {"label": "Unavailable", "source": "BrickLink", "error": "BrickLink returned status " + str(response.status_code)},
         };
     }
 
@@ -527,8 +385,6 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
     color_label = str(safe_get(best_color, "label", "Unknown"));
     if color_label == "Unknown" or color_label == "Unavailable" or color_label == "" {
         best_color = fallback_color;
-    } else {
-        best_color["fallback"] = fallback_color;
     }
 
     return {
