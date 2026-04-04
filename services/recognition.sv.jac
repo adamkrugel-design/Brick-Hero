@@ -184,9 +184,14 @@ def parse_bricklink_color(page_text: str) -> dict {
             continue;
         }
         section = page_text.split(marker, 1)[1];
+        section = section.split("Years Released:", 1)[0];
+        section = section.split("Year Released:", 1)[0];
+        section = section.split("Weight:", 1)[0];
         section = section.split("<br", 1)[0];
         section = section.split("</td>", 1)[0];
         section = section.replace("&nbsp;", " ");
+        section = section.replace("&amp;", "&");
+
         cleaned = "";
         inside_tag = False;
         for ch in section {
@@ -202,8 +207,15 @@ def parse_bricklink_color(page_text: str) -> dict {
                 cleaned = cleaned + ch;
             }
         }
+
+        cleaned = cleaned.replace("\n", " ");
+        cleaned = cleaned.replace("\r", " ");
+        while "  " in cleaned {
+            cleaned = cleaned.replace("  ", " ");
+        }
         cleaned = cleaned.strip();
-        if cleaned {
+
+        if cleaned and len(cleaned) <= 40 and "function" not in cleaned.lower() and "{" not in cleaned and "}" not in cleaned {
             return {"label": cleaned, "source": "BrickLink"};
         }
     }
