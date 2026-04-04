@@ -4,6 +4,7 @@ def:pub CountdownApp() -> JsxElement {
     has analyzing: bool = False;
     has status: str = "Camera ready";
     has permission: str = "Idle";
+    has camera_active: bool = False;
     has captured_frame: str = "";
     has active_name: str = "No result yet";
     has active_confidence: str = "0%";
@@ -12,80 +13,97 @@ def:pub CountdownApp() -> JsxElement {
     has payload_text: str = "image/png · 0 bytes";
     has candidate_text: str = "0 matches returned";
 
-    async def start_camera() -> None {
-        try {
-            permission = "Requesting";
-            status = "Requesting webcam access...";
-
-            media_devices = web.navigator.mediaDevices;
-            if not media_devices {
-                permission = "Unavailable";
-                status = "This browser does not support webcam access";
-                return;
-            }
-
-            existing_stream = web.window.__legoScannerStream;
-            if existing_stream {
-                for track in existing_stream.getTracks() {
-                    track.stop();
-                }
-                web.window.__legoScannerStream = None;
-            }
-
-            video = web.document.getElementById("scanner-video");
-            if not video {
-                permission = "Unavailable";
-                status = "Video element not found";
-                return;
-            }
-
-            video.srcObject = None;
-            video.muted = True;
-            video.autoplay = True;
-            video.playsInline = True;
-
-            stream = None;
-            try {
-                stream = await media_devices.getUserMedia({"video": {"facingMode": "user", "width": {"ideal": 1280}, "height": {"ideal": 720}}, "audio": False});
-            } except Exception {
-                stream = await media_devices.getUserMedia({"video": True, "audio": False});
-            }
-
-            if not stream {
-                permission = "Unavailable";
-                status = "Unable to create webcam stream";
-                return;
-            }
-
-            video.srcObject = stream;
-            web.window.__legoScannerStream = stream;
-            permission = "Granted";
-            status = "Webcam connected";
-
-            try {
-                await video.play();
-            } except Exception {
-            }
-
-            status = "Webcam active";
-        } except Exception as e {
-            permission = "Denied";
-            status = "Unable to start webcam: " + str(e);
-        }
+    def get_video() -> any {
+        return web.document.getElementById("scanner-video");
     }
 
-    def stop_camera() -> None {
+    def get_canvas() -> any {
+        return web.document.getElementById("scanner-canvas");
+    }
+
+    def clear_stream() -> None {
         stream = web.window.__legoScannerStream;
         if stream {
             for track in stream.getTracks() {
                 track.stop();
             }
         }
-        video = web.document.getElementById("scanner-video");
+        video = get_video();
         if video {
+            try {
+                video.pause();
+            } except Exception {
+            }
             video.srcObject = None;
         }
         web.window.__legoScannerStream = None;
+        camera_active = False;
+    }
+
+    async def start_camera() -> None {
+        try {
+            permission = "Requesting";
+            status = "Requesting webcam access...";
+            camera_active = False;
+
+            media_devices = web.navigator.mediaDevices;
+            if not media_devices or not media_devices.getUserMedia {
+                permission = "Unavailable";
+                status = "This browser does not support webcam access";
+                return;
+            }
+
+            clear_stream();
+
+            video = get_video();
+            if not video {
+                permission = "Unavailable";
+                status = "Video element not found";
+                return;
+            }
+
+            video.muted = True;
+            video.autoplay = True;
+            video.playsInline = True;
+            video.setAttribute("autoplay", "true");
+            video.setAttribute("muted", "true");
+            video.setAttribute("playsinline", "true");
+
+            stream = await media_devices.getUserMedia({"video": True, "audio": False});
+            if not stream {
+                permission = "Unavailable";
+                status = "Unable to create webcam stream";
+                return;
+            }
+
+            tracks = stream.getVideoTracks();
+            if not tracks or len(tracks) == 0 {
+                clear_stream();
+                permission = "Unavailable";
+                status = "No video track available";
+                return;
+            }
+
+            video.srcObject = stream;
+            web.window.__legoScannerStream = stream;
+
+            try {
+                await video.play();
+            } except Exception {
+            }
+
+            permission = "Granted";
+            camera_active = True;
+            status = "Webcam active";
+        } except Exception as e {
+            clear_stream();
+            permission = "Denied";
+            status = "Unable to start webcam: " + str(e);
+        }
+    }
+
+    def stop_camera() -> None {
+        clear_stream();
         permission = "Stopped";
         status = "Camera stopped";
     }
@@ -119,13 +137,13 @@ def:pub CountdownApp() -> JsxElement {
             status = "Recognition already in progress";
             return;
         }
-        video = web.document.getElementById("scanner-video");
-        canvas = web.document.getElementById("scanner-canvas");
+        video = get_video();
+        canvas = get_canvas();
         if not video or not canvas {
             status = "Camera surface not ready";
             return;
         }
-        if not video.srcObject {
+        if not video.srcObject or not camera_active {
             status = "Start the webcam first";
             return;
         }
@@ -160,7 +178,7 @@ def:pub CountdownApp() -> JsxElement {
                 <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-black">
                     <div className="relative min-h-80 bg-neutral-950">
                         <video id="scanner-video" className="h-full min-h-80 w-full object-cover" autoPlay={True} muted={True} playsInline={True}></video>
-                        {(permission != "Granted") and (
+                        {(not camera_active) and (
                             <div className="absolute inset-0 flex items-center justify-center bg-black/60 px-6 text-center text-sm text-white/80">
                                 Start the webcam to preview the live camera feed.
                             </div>
@@ -172,7 +190,7 @@ def:pub CountdownApp() -> JsxElement {
 
                 <div className="mt-5 flex flex-wrap gap-3">
                     <button className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/30" onClick={start_camera}>Start webcam</button>
-                    <button className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-card-hover focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60" onClick={capture_frame} disabled={analyzing}>{analyzing and "Analyzing..." or "Capture snapshot"}</button>
+                    <button className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-card-hover focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60" onClick={capture_frame} disabled={analyzing or (not camera_active)}>{analyzing and "Analyzing..." or "Capture snapshot"}</button>
                     <button className="rounded-xl border border-border bg-muted px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary/20" onClick={stop_camera}>Stop webcam</button>
                 </div>
 
