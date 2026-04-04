@@ -275,7 +275,65 @@ def estimate_image_color(raw: bytes) -> dict {
     if not raw {
         return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
     }
-    return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
+
+    sample_limit = len(raw);
+    if sample_limit > 3072 {
+        sample_limit = 3072;
+    }
+    if sample_limit < 3 {
+        return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
+    }
+
+    red_total = 0;
+    green_total = 0;
+    blue_total = 0;
+    pixel_count = 0;
+    idx = 0;
+    while idx + 2 < sample_limit {
+        red_total = red_total + int(raw[idx]);
+        green_total = green_total + int(raw[idx + 1]);
+        blue_total = blue_total + int(raw[idx + 2]);
+        pixel_count = pixel_count + 1;
+        idx = idx + 3;
+    }
+
+    if pixel_count == 0 {
+        return {"label": "Unknown", "source": "Image fallback", "rgb": ""};
+    }
+
+    avg_red = int(round(red_total / pixel_count));
+    avg_green = int(round(green_total / pixel_count));
+    avg_blue = int(round(blue_total / pixel_count));
+    rgb_text = str(avg_red) + ", " + str(avg_green) + ", " + str(avg_blue);
+
+    palette = [
+        {"label": "Black", "r": 27, "g": 42, "b": 52},
+        {"label": "White", "r": 242, "g": 243, "b": 242},
+        {"label": "Light Bluish Gray", "r": 160, "g": 165, "b": 169},
+        {"label": "Dark Bluish Gray", "r": 99, "g": 95, "b": 98},
+        {"label": "Red", "r": 196, "g": 40, "b": 27},
+        {"label": "Blue", "r": 13, "g": 105, "b": 171},
+        {"label": "Green", "r": 40, "g": 127, "b": 70},
+        {"label": "Yellow", "r": 245, "g": 205, "b": 47},
+        {"label": "Tan", "r": 228, "g": 205, "b": 158},
+        {"label": "Brown", "r": 124, "g": 92, "b": 70},
+        {"label": "Dark Tan", "r": 149, "g": 138, "b": 115},
+        {"label": "Orange", "r": 218, "g": 133, "b": 65},
+        {"label": "Dark Green", "r": 40, "g": 70, "b": 45},
+        {"label": "Trans-Clear", "r": 236, "g": 236, "b": 236},
+    ];
+
+    best_label = "Unknown";
+    best_distance = -1;
+    for swatch in palette {
+        distance = ((avg_red - swatch["r"]) * (avg_red - swatch["r"])) + ((avg_green - swatch["g"]) * (avg_green - swatch["g"])) + ((avg_blue - swatch["b"]) * (avg_blue - swatch["b"]));
+        if best_distance < 0 or distance < best_distance {
+            best_distance = distance;
+            best_label = str(swatch["label"]);
+        }
+    }
+
+    return {"label": best_label, "source": "Image fallback", "rgb": rgb_text};
 }
 
 
