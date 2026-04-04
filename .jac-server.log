@@ -55,14 +55,13 @@
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
-rojects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:54:24
-   52 |             status = "Webcam active";
-   53 |         } catch Exception as e {
-   54 |             permission = "Denied";
-      |                        ^
-   55 |             status = "Unable to start webcam: " + str(e);
-   56 |         }
-✖ Error: error[E0005]: Unexpected token '}'
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+nexpected token '}'
   --> /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:57:5
    55 |             status = "Unable to start webcam: " + str(e);
    56 |         }
@@ -219,12 +218,13 @@ rojects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:54:24
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
-d-foreground">
-  193 |                                 <p className="font-medium text-foreground">Provider</p>
-  194 |                                 <p className="mt-1">{provider}</p>
-      |                                                              ^
-  195 |                             </div>
-  196 |                             <div className="rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+"rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
 ✖ Error: error[E0005]: Unexpected token '}'
   --> /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:198:66
   196 |                             <div className="rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
@@ -260,3 +260,15 @@ d-foreground">
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 5:07:41 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+5:11:39 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+5:24:45 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+5:25:31 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+5:25:34 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+5:31:37 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+5:32:05 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
