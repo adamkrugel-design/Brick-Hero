@@ -28,10 +28,8 @@ INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,
    Monitoring: **/*.jac (3 files)
 
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
-tp://localhost:8002/
-  ➜  Network:   http://192.168.61.30:8002/
-
-  🚀 Server ready
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+ 🚀 Server ready
 
   Mode: Development (with HMR)
     Vite:  http://localhost:8000/
@@ -41,4 +39,5 @@ tp://localhost:8002/
    Monitoring: **/*.jac (3 files)
 
 3:43:08 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
