@@ -15,6 +15,10 @@ def:pub CountdownApp() -> JsxElement {
     can with entry {
         status = "Camera ready";
         permission = "Idle";
+        try {
+            web.window.__legoScannerPing = "ready";
+        } except Exception {
+        }
     }
 
     async def start_camera() -> None {
@@ -91,29 +95,15 @@ def:pub CountdownApp() -> JsxElement {
             video.srcObject = stream;
             web.window.__legoScannerStream = stream;
 
+            permission = "Granted";
+            status = "Webcam stream connected";
+
             try {
                 await video.play();
+                status = "Webcam active";
             } except Exception {
+                status = "Webcam connected; tap Start webcam again if preview is still paused";
             }
-
-            try {
-                if int(video.readyState or 0) < 2 {
-                    await web.Promise(lambda resolve, reject: any -> None {
-                        def handle_loaded() -> None {
-                            resolve(True);
-                        }
-                        video.onloadedmetadata = handle_loaded;
-                    });
-                    try {
-                        await video.play();
-                    } except Exception {
-                    }
-                }
-            } except Exception {
-            }
-
-            permission = "Granted";
-            status = "Webcam active";
         } except Exception as e {
             permission = "Denied";
             status = "Unable to start webcam: " + str(e);
