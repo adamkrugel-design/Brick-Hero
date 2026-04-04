@@ -216,15 +216,17 @@ def:pub CountdownApp() -> JsxElement {
                             <p className="mt-3 text-sm text-cyan-100/75"><span className="font-semibold text-cyan-100">Colorway:</span> {active_match["color"]}</p>
                             <p className="mt-2 text-sm text-cyan-100/70">{active_match["notes"]}</p>
                         </div>
-                        {[<div key={item["name"]} className="rounded-[1.25rem] border border-fuchsia-300/20 bg-fuchsia-400/6 p-4 shadow-soft">
-                            <div className="flex items-start justify-between gap-3">
-                                <div>
-                                    <p className="retro-display text-xs font-semibold tracking-[0.24em] text-fuchsia-200/80">Secondary lock</p>
-                                    <h3 className="retro-display text-lg font-bold text-cyan-100">{item["name"]}</h3>
+                        {[(
+                            <div key={item["name"]} className="rounded-[1.25rem] border border-fuchsia-300/20 bg-fuchsia-400/6 p-4 shadow-soft">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p className="retro-display text-xs font-semibold tracking-[0.24em] text-fuchsia-200/80">Secondary lock</p>
+                                        <h3 className="retro-display text-lg font-bold text-cyan-100">{item["name"]}</h3>
+                                    </div>
+                                    <span className="retro-display inline-flex rounded-full border border-fuchsia-300/30 bg-fuchsia-500 px-3 py-1 text-xs font-bold text-white">{item["confidence"]}</span>
                                 </div>
-                                <span className="retro-display inline-flex rounded-full border border-fuchsia-300/30 bg-fuchsia-500 px-3 py-1 text-xs font-bold text-white">{item["confidence"]}</span>
                             </div>
-                        </div> for item in alt_matches if item]}
+                        ) for item in alt_matches if item]}
                     </div>
                 </div>
 
@@ -251,15 +253,17 @@ def:pub CountdownApp() -> JsxElement {
                     <p className="retro-display text-xs font-semibold tracking-[0.28em] text-cyan-300/80">Feature confidence</p>
                     <h2 className="retro-display mt-2 text-2xl font-extrabold text-cyan-100">Recognition signals</h2>
                     <div className="mt-5 space-y-4">
-                        {[<div key={feature["label"]}>
-                            <div className="mb-2 flex items-center justify-between gap-3 text-sm">
-                                <span className="retro-display text-xs font-semibold text-cyan-100">{feature["label"]}</span>
-                                <span className="text-cyan-100/70">{feature["value"]}%</span>
+                        {[(
+                            <div key={feature["label"]}>
+                                <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+                                    <span className="retro-display text-xs font-semibold text-cyan-100">{feature["label"]}</span>
+                                    <span className="text-cyan-100/70">{feature["value"]}%</span>
+                                </div>
+                                <div className="h-3 overflow-hidden rounded-full border border-cyan-300/20 bg-slate-950">
+                                    <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-amber-300" style={{"width": str(feature["value"]) + "%"}}></div>
+                                </div>
                             </div>
-                            <div className="h-3 overflow-hidden rounded-full border border-cyan-300/20 bg-slate-950">
-                                <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-amber-300" style={{"width": str(feature["value"]) + "%"}}></div>
-                            </div>
-                        </div> for feature in feature_scores if feature]}
+                        ) for feature in feature_scores if feature]}
                     </div>
                 </div>
             </section>

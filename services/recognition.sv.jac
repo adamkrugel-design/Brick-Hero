@@ -19,14 +19,14 @@ def parse_data_url(frame_data: str) -> tuple[str, bytes] {
 }
 
 
-def safe_get(source: any, key: str, default: any = None) -> any {
+def safe_get(source: any, key: str) -> any {
     if source == None {
-        return default;
+        return None;
     }
     try {
-        return source.get(key, default);
+        return source.get(key);
     } except Exception {
-        return default;
+        return None;
     }
 }
 
@@ -40,7 +40,7 @@ def normalize_items(payload: any) -> list {
     }
     if type(payload) == dict {
         for key in ["items", "predictions", "results"] {
-            value = safe_get(payload, key, []);
+            value = safe_get(payload, key);
             if type(value) == list {
                 return value;
             }
@@ -52,7 +52,7 @@ def normalize_items(payload: any) -> list {
 
 def item_name(item: any) -> str {
     for key in ["name", "label", "class_name", "id", "part_num"] {
-        value = safe_get(item, key, "");
+        value = safe_get(item, key);
         if value {
             return str(value);
         }
@@ -63,7 +63,7 @@ def item_name(item: any) -> str {
 
 def item_confidence(item: any) -> int {
     for key in ["score", "confidence", "probability"] {
-        value = safe_get(item, key, None);
+        value = safe_get(item, key);
         if value != None {
             try {
                 numeric = float(value);
@@ -73,6 +73,7 @@ def item_confidence(item: any) -> int {
                 return int(round(numeric));
             } except Exception {
                 pass;
+            }
         }
     }
     return 0;
@@ -81,7 +82,7 @@ def item_confidence(item: any) -> int {
 
 def item_image(item: any) -> str {
     for key in ["image", "image_url", "thumbnail", "thumbnail_url"] {
-        value = safe_get(item, key, "");
+        value = safe_get(item, key);
         if value {
             return str(value);
         }
@@ -92,7 +93,7 @@ def item_image(item: any) -> str {
 
 def item_external_url(item: any) -> str {
     for key in ["url", "external_url", "bricklink_url", "brickset_url"] {
-        value = safe_get(item, key, "");
+        value = safe_get(item, key);
         if value {
             return str(value);
         }
@@ -103,12 +104,29 @@ def item_external_url(item: any) -> str {
 
 def item_notes(item: any) -> str {
     for key in ["description", "category", "part_num", "id"] {
-        value = safe_get(item, key, "");
+        value = safe_get(item, key);
         if value {
             return str(value);
         }
     }
-    return "Trained Brickognize classification result."
+    return "Trained Brickognize classification result.";
+}
+
+
+def sort_ranked(items: list) -> list {
+    ordered = [];
+    remaining = items;
+    while len(remaining) > 0 {
+        best = remaining[0];
+        for item in remaining {
+            if item["confidence_value"] > best["confidence_value"] {
+                best = item;
+            }
+        }
+        ordered.append(best);
+        remaining = [item for item in remaining if item != best];
+    }
+    return ordered;
 }
 
 
@@ -158,18 +176,20 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
     }
 
     if len(ranked) == 0 {
-        fallback_name = safe_get(payload, "name", "Unknown part");
-        fallback_confidence = item_confidence(payload);
+        fallback_name = safe_get(payload, "name");
+        if not fallback_name {
+            fallback_name = "Unknown part";
+        }
         ranked = [{
             "name": str(fallback_name),
-            "confidence_value": fallback_confidence,
+            "confidence_value": item_confidence(payload),
             "image": item_image(payload),
             "url": item_external_url(payload),
             "notes": item_notes(payload),
         }];
     }
 
-    ranked = sorted(ranked, key=lambda item: item["confidence_value"], reverse=True);
+    ranked = sort_ranked(ranked);
     best = ranked[0];
     alternatives = [
         {
@@ -194,7 +214,7 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
         "alt_matches": alternatives,
         "feature_scores": [
             {"label": "Model confidence", "value": best["confidence_value"]},
-            {"label": "API response quality", "value": 100 if len(ranked) > 0 else 0},
+            {"label": "API response quality", "value": len(ranked) > 0 and 100 or 0},
             {"label": "Candidate depth", "value": min(len(ranked) * 25, 100)},
         ],
         "telemetry": {

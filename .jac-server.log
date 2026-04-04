@@ -107,6 +107,17 @@ services/recognition.sv.jac, line 24, col 9: Unexpected token 'return'
 services/recognition.sv.jac, line 24, col 23: Unexpected semicolon at module level
 services/recognition.sv.jac, line 25, col 5: Unexpected token '}'
 services/recognition.sv.jac, line 26, col 5: Unexpected token 'try'
+services/recognition.sv.jac, line 27,✖ Error: Import error in ./components/countdownApp.cl.jac: No bytecode found for /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/services/recognition.sv.jac
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+services/recognition.sv.jac, line 22, col 37: 'default' is a keyword and cannot be used as a parameter name (prefix with backtick to escape: `default)
+services/recognition.sv.jac, line 22, col 37: Missing ')'
+services/recognition.sv.jac, line 22, col 37: Missing ';'
+services/recognition.sv.jac, line 22, col 37: Unexpected token 'default'
+services/recognition.sv.jac, line 23, col 5: Unexpected token 'if'
+services/recognition.sv.jac, line 24, col 9: Unexpected token 'return'
+services/recognition.sv.jac, line 24, col 23: Unexpected semicolon at module level
+services/recognition.sv.jac, line 25, col 5: Unexpected token '}'
+services/recognition.sv.jac, line 26, col 5: Unexpected token 'try'
 services/recognition.sv.jac, line 27, col 9: Unexpected token 'return'
 services/recognition.sv.jac, line 27, col 40: Unexpected semicolon at module level
 services/recognition.sv.jac, line 28, col 5: Unexpected token '}'
@@ -116,3 +127,33 @@ services/recognition.sv.jac, line 30, col 5: Unexpected token '}'
 services/recognition.sv.jac, line 31, col 1: Unexpected token '}'
 services/recognition.sv.jac, line 112, col 1: Missing ';'
 services/recognition.sv.jac, line 209, col 1: Missing '}'
+✖ Error: Import error in ./components/countdownApp.cl.jac: No bytecode found for /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/services/recognition.sv.jac
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+services/recognition.sv.jac, line 22, col 37: 'default' is a keyword and cannot be used as a parameter name (prefix with backtick to escape: `default)
+services/recognition.sv.jac, line 22, col 37: Missing ')'
+services/recognition.sv.jac, line 22, col 37: Missing ';'
+services/recognition.sv.jac, line 22, col 37: Unexpected token 'default'
+services/recognition.sv.jac, line 23, col 5: Unexpected token 'if'
+services/recognition.sv.jac, line 24, col 9: Unexpected token 'return'
+services/recognition.sv.jac, line 24, col 23: Unexpected semicolon at module level
+services/recognition.sv.jac, line 25, col 5: Unexpected token '}'
+services/recognition.sv.jac, line 26, col 5: Unexpected token 'try'
+services/recognition.sv.jac, line 27, col 9: Unexpected token 'return'
+services/recognition.sv.jac, line 27, col 40: Unexpected semicolon at module level
+services/recognition.sv.jac, line 28, col 5: Unexpected token '}'
+services/recognition.sv.jac, line 29, col 9: Unexpected token 'return'
+services/recognition.sv.jac, line 29, col 23: Unexpected semicolon at module level
+services/recognition.sv.jac, line 30, col 5: Unexpected token '}'
+services/recognition.sv.jac, line 31, col 1: Unexpected token '}'
+services/recognition.sv.jac, line 112, col 1: Missing ';'
+services/recognition.sv.jac, line 209, col 1: Missing '}'
+[HMR] Reloaded: ./services/recognition.sv.jac
+ognition.sv.jac, line 27, col 40: Unexpected semicolon at module level
+services/recognition.sv.jac, line 28, col 5: Unexpected token '}'
+services/recognition.sv.jac, line 29, col 9: Unexpected token 'return'
+services/recognition.sv.jac, line 29, col 23: Unexpected semicolon at module level
+services/recognition.sv.jac, line 30, col 5: Unexpected token '}'
+services/recognition.sv.jac, line 31, col 1: Unexpected token '}'
+services/recognition.sv.jac, line 112, col 1: Missing ';'
+services/recognition.sv.jac, line 209, col 1: Missing '}'
+[HMR] Reloaded: ./services/recognition.sv.jac
