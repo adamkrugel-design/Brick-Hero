@@ -103,13 +103,54 @@ def item_notes(item: any) -> str {
 }
 
 
+def bricklink_part_id_from_url(url: str) -> str {
+    if not url {
+        return "";
+    }
+    if "?P=" in url {
+        part_section = url.split("?P=", 1)[1];
+        return part_section.split("&", 1)[0].strip();
+    }
+    if "?S=" in url {
+        part_section = url.split("?S=", 1)[1];
+        return part_section.split("&", 1)[0].strip();
+    }
+    return "";
+}
+
+
 def item_part_id(item: any) -> str {
-    for key in ["id", "part_num", "item_no"] {
+    external_sites = safe_get(item, "external_sites", []);
+    if type(external_sites) == list {
+        for site in external_sites {
+            site_name = str(safe_get(site, "name", "")).lower();
+            site_url = str(safe_get(site, "url", ""));
+            if site_name == "bricklink" and site_url {
+                bricklink_part_id = bricklink_part_id_from_url(site_url);
+                if bricklink_part_id {
+                    return bricklink_part_id;
+                }
+            }
+        }
+    }
+
+    for key in ["part_num", "item_no", "id", "part_id"] {
         value = safe_get(item, key, "");
         if value {
             return str(value);
         }
     }
+
+    identifiers = safe_get(item, "identifiers", None);
+    if type(identifiers) == dict {
+        for key in ["bricklink", "bricklink_id", "part_num", "item_no", "id"] {
+            value = safe_get(identifiers, key, "");
+            if value {
+                return str(value);
+            }
+        }
+    }
+
     return "";
 }
 
@@ -323,6 +364,7 @@ def:pub recognize_lego_frame(frame_data: str) -> dict {
             "confidence": str(best_confidence_value) + "%",
             "notes": best_notes,
             "part_id": best_part_id,
+            "specific_part_number": best_part_id,
             "bricklink_url": best_bricklink_url,
             "years_released": years_released,
             "color": best_color,

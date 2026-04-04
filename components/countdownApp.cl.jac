@@ -131,7 +131,7 @@ def:pub CountdownApp() -> JsxElement {
                 active_name = str(match_info["name"] or "Unknown part");
                 active_confidence = str(match_info["confidence"] or "0%");
                 active_notes = str(match_info["notes"] or "Recognition complete.");
-                active_part_id = str(match_info["part_id"] or "—");
+                active_part_id = str(match_info["specific_part_number"] or match_info["part_id"] or "—");
                 active_years = str(years_info["label"] or match_info["years_released_label"] or "Unknown");
                 active_years_start = str(years_info["start"] or match_info["years_released_start"] or "");
                 active_years_end = str(years_info["end"] or match_info["years_released_end"] or "");
