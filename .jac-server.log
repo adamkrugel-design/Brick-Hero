@@ -29,15 +29,42 @@ INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,
 
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
- 🚀 Server ready
-
-  Mode: Development (with HMR)
-    Vite:  http://localhost:8000/
-    API:   http://localhost:8002/
-
-👀 Watching for changes...
-   Monitoring: **/*.jac (3 files)
-
-3:43:08 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+✖ Error: Compile error in ./components/countdownApp.cl.jac:
+components/countdownApp.cl.jac, line 264, col 29: Missing '}'
+components/countdownApp.cl.jac, line 264, col 29: Expected '</', got 'NAME'
+components/countdownApp.cl.jac, line 264, col 44: Expected 'JSX_NAME', got '{'
+components/countdownApp.cl.jac, line 265, col 29: Expected 'JSX_TAG_END', got 'JSX_OPEN_START'
+components/countdownApp.cl.jac, line 265, col 30: Expected '</', got 'JSX_NAME'
+components/countdownApp.cl.jac, line 265, col 37: Expected 'JSX_TAG_END', got '='
+components/countdownApp.cl.jac, line 265, col 55: Expected '</', got 'JSX_NAME'
+components/countdownApp.cl.jac, line 265, col 58: Expected 'JSX_NAME', got '='
+components/countdownApp.cl.jac, line 265, col 59: Expected 'JSX_TAG_END', got 'STRING'
+components/countdownApp.cl.jac, line 265, col 81: Expected '</', got 'JSX_NAME'
+components/countdownApp.cl.jac, line 265, col 90: Expected 'JSX_NAME', got '='
+components/countdownApp.cl.jac, line 265, col 91: Expected 'JSX_TAG_END', got 'STRING'
+components/countdownApp.cl.jac, line 265, col 118: Expected '</', got '/>'
+components/countdownApp.cl.jac, line 266, col 25: Expected 'JSX_NAME', got '}'
+components/countdownApp.cl.jac, line 266, col 27: Expected 'JSX_TAG_END', got 'else'
+components/countdownApp.cl.jac, line 266, col 32: Missing ';'
+components/countdownApp.cl.jac, line 268, col 26: Missing ';'
+components/countdownApp.cl.jac, line 268, col 27: Unexpected token '
+                    '
+components/countdownApp.cl.jac, line 276, col 53: Unexpected token '}'
+components/countdownApp.cl.jac, line 278, col 98: Unexpected token '}'
+components/countdownApp.cl.jac, line 279, col 83: Unexpected token '}'
+components/countdownApp.cl.jac, line 282, col 170: Unexpected token '}'
+components/countdownApp.cl.jac, line 282, col 171: Unexpected token '}'
+components/countdownApp.cl.jac, line 284, col 32: Unexpected token 'for'
+components/countdownApp.cl.jac, line 284, col 62: Unexpected token 'if'
+components/countdownApp.cl.jac, line 284, col 73: Unexpected token '}'
+components/countdownApp.cl.jac, line 289, col 12: Unexpected semicolon at module level
+components/countdownApp.cl.jac, line 290, col 1: Unexpected token '}'
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+components/countdownApp.cl.jac, line 282, col 170: Unexpected token '}'
+components/countdownApp.cl.jac, line 282, col 171: Unexpected token '}'
+components/countdownApp.cl.jac, line 284, col 32: Unexpected token 'for'
+components/countdownApp.cl.jac, line 284, col 62: Unexpected token 'if'
+components/countdownApp.cl.jac, line 284, col 73: Unexpected token '}'
+components/countdownApp.cl.jac, line 289, col 12: Unexpected semicolon at module level
+components/countdownApp.cl.jac, line 290, col 1: Unexpected token '}'
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js

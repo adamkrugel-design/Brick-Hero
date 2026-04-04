@@ -261,7 +261,7 @@ def:pub CountdownApp() -> JsxElement {
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Captured frame</p>
                     <h2 className="mt-2 text-2xl font-extrabold">Latest snapshot</h2>
                     <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-border bg-slate-100">
-                        {captured_frame and <img src={captured_frame} alt="Captured LEGO frame" className="h-64 w-full object-cover" /> or <div className="flex h-64 items-center justify-center px-6 text-center text-sm text-slate-500">Capture a frame from the live webcam feed to preview the exact image used for recognition.</div>}
+                        {(captured_frame != "") and (<img src={captured_frame} alt="Captured LEGO frame" className="h-64 w-full object-cover" />) or (<div className="flex h-64 items-center justify-center px-6 text-center text-sm text-slate-500">Capture a frame from the live webcam feed to preview the exact image used for recognition.</div>)}
                     </div>
                 </div>
 
