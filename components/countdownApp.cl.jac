@@ -96,6 +96,22 @@ def:pub CountdownApp() -> JsxElement {
             } except Exception {
             }
 
+            try {
+                if int(video.readyState or 0) < 2 {
+                    await web.Promise(lambda resolve, reject: any -> None {
+                        def handle_loaded() -> None {
+                            resolve(True);
+                        }
+                        video.onloadedmetadata = handle_loaded;
+                    });
+                    try {
+                        await video.play();
+                    } except Exception {
+                    }
+                }
+            } except Exception {
+            }
+
             permission = "Granted";
             status = "Webcam active";
         } except Exception as e {
