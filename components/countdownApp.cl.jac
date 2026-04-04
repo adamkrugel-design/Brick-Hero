@@ -14,15 +14,15 @@ def:pub CountdownApp() -> JsxElement {
     has candidate_text: str = "0 matches returned";
 
     def get_video() -> any {
-        return web.document.getElementById("scanner-video");
+        return document.getElementById("scanner-video");
     }
 
     def get_canvas() -> any {
-        return web.document.getElementById("scanner-canvas");
+        return document.getElementById("scanner-canvas");
     }
 
     def clear_stream() -> None {
-        stream = web.window.__legoScannerStream;
+        stream = globalThis.__legoScannerStream;
         if stream {
             for track in stream.getTracks() {
                 track.stop();
@@ -36,7 +36,7 @@ def:pub CountdownApp() -> JsxElement {
             }
             video.srcObject = None;
         }
-        web.window.__legoScannerStream = None;
+        globalThis.__legoScannerStream = None;
         camera_active = False;
     }
 
@@ -46,7 +46,7 @@ def:pub CountdownApp() -> JsxElement {
             status = "Requesting webcam access...";
             camera_active = False;
 
-            media_devices = web.navigator.mediaDevices;
+            media_devices = navigator.mediaDevices;
             if not media_devices or not media_devices.getUserMedia {
                 permission = "Unavailable";
                 status = "This browser does not support webcam access";
@@ -85,7 +85,7 @@ def:pub CountdownApp() -> JsxElement {
             }
 
             video.srcObject = stream;
-            web.window.__legoScannerStream = stream;
+            globalThis.__legoScannerStream = stream;
 
             try {
                 await video.play();

@@ -77,16 +77,19 @@
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
-imal scanner</h1>
-  138 |                         </div>
-  139 |                         <div className="rounded-full border border-border bg-muted px-3 py-1 text-sm text-muted-foreground">{permission}</div>
-      |                                                                                                                                        ^
-  140 |                     </div>
-  141 | 
-✖ Error: error[E0005]: Unexpected token '}'
-  --> /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:146:117
-  144 |                     <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-black">
-  145 |                         <div className="relative min-h-80 bg-neutral-950">
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+relative min-h-80 bg-neutral-950">
   146 |                             <video id="scanner-video" className="h-full min-h-80 w-full object-cover" autoPlay={True} muted={True} playsInline={True}></video>
       |                                                                                                                     ^
   147 |                             {(permission != "Granted") and (
@@ -238,19 +241,19 @@ imal scanner</h1>
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
-                         <div className="rounded-2xl border border-border bg-muted p-4 text-sm text-muted-foreground">
-  201 |                                 <p className="font-medium text-foreground">Matches</p>
-  202 |                                 <p className="mt-1">{candidate_text}</p>
-      |                                                                    ^
-  203 |                             </div>
-  204 |                         </div>
-✖ Error: error[E0030]: Unexpected semicolon at module level
-  --> /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/main.jac:209:6
-  207 |             </div>
-  208 |         </main>
-  209 |     );
-      |      ^
-  210 | }
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+ | }
   211 | 
 ✖ Error: error[E0005]: Une[HMR] Reloaded: ./main.jac
 ✔ Recompiled: ./main.jac -> main.js
@@ -299,3 +302,16 @@ imal scanner</h1>
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 6:03:40 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+[HMR] Reloaded: ./components/countdownApp.cl.jac
+✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
+6:07:26 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
