@@ -13,6 +13,8 @@ def:pub CountdownApp() -> JsxElement {
     has active_notes: str = "Start the webcam and capture a snapshot to identify a LEGO part.";
     has active_part_id: str = "—";
     has active_years: str = "Unknown";
+    has active_years_start: str = "";
+    has active_years_end: str = "";
     has active_years_source: str = "BrickLink";
     has active_color: str = "Unknown";
     has active_color_source: str = "Brickognize";
@@ -131,6 +133,8 @@ def:pub CountdownApp() -> JsxElement {
                 active_notes = str(match_info["notes"] or "Recognition complete.");
                 active_part_id = str(match_info["part_id"] or "—");
                 active_years = str(years_info["label"] or "Unknown");
+                active_years_start = str(years_info["start"] or "");
+                active_years_end = str(years_info["end"] or "");
                 active_years_source = str(years_info["source"] or "BrickLink");
                 active_color = str(color_info["label"] or "Unknown");
                 active_color_source = str(color_info["source"] or "Brickognize");
@@ -228,27 +232,54 @@ def:pub CountdownApp() -> JsxElement {
                             <span className="rounded-full bg-card px-3 py-1 text-sm font-medium text-foreground">{active_confidence}</span>
                         </div>
                         <p className="mt-3 text-sm leading-6 text-muted-foreground">{active_notes}</p>
-                        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Part ID</p>
-                                <p className="mt-1">{active_part_id}</p>
+                                <p className="mt-1 text-base font-semibold text-foreground">{active_part_id}</p>
+                                <p className="mt-1 text-xs">Catalog reference</p>
                             </div>
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Years released</p>
-                                <p className="mt-1">{active_years}</p>
+                                <p className="mt-1 text-base font-semibold text-foreground">{active_years}</p>
                                 <p className="mt-1 text-xs">Source: {active_years_source}</p>
                             </div>
                             <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
+                                <p className="font-medium text-foreground">Release range</p>
+                                <p className="mt-1 text-base font-semibold text-foreground">{active_years_start != "" and (active_years_start + " → " + active_years_end) or "Unknown"}</p>
+                                <p className="mt-1 text-xs">Start and end years</p>
+                            </div>
+                            <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
                                 <p className="font-medium text-foreground">Detected color</p>
-                                <p className="mt-1">{active_color}</p>
+                                <p className="mt-1 text-base font-semibold text-foreground">{active_color}</p>
                                 <p className="mt-1 text-xs">Source: {active_color_source}</p>
                             </div>
                         </div>
-                        {(active_bricklink_url != "") and (
-                            <a href={active_bricklink_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-hover">
-                                Open on BrickLink
-                            </a>
-                        )}
+                        <div className="mt-4 rounded-2xl border border-border bg-card p-4">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-xs uppercase tracking-wide text-muted-foreground">Detection details</p>
+                                    <p className="mt-1 text-sm text-muted-foreground">Recognition provider, release metadata, and catalog lookup for the detected LEGO part.</p>
+                                </div>
+                                <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground">{provider}</span>
+                            </div>
+                            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                                <div className="rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
+                                    <p className="font-medium text-foreground">Recognition summary</p>
+                                    <p className="mt-2">Confidence: <span className="font-semibold text-foreground">{active_confidence}</span></p>
+                                    <p className="mt-1">Color source: <span className="font-semibold text-foreground">{active_color_source}</span></p>
+                                </div>
+                                <div className="rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
+                                    <p className="font-medium text-foreground">Catalog summary</p>
+                                    <p className="mt-2">Years source: <span className="font-semibold text-foreground">{active_years_source}</span></p>
+                                    <p className="mt-1">BrickLink lookup: <span className="font-semibold text-foreground">{active_bricklink_url != "" and "Available" or "Unavailable"}</span></p>
+                                </div>
+                            </div>
+                            {(active_bricklink_url != "") and (
+                                <a href={active_bricklink_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl border border-border bg-muted px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-hover">
+                                    Open on BrickLink
+                                </a>
+                            )}
+                        </div>
                     </div>
                 </div>
 
