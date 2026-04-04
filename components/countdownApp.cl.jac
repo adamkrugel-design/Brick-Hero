@@ -1,5 +1,6 @@
 sv import from ..services.recognition { recognize_lego_frame }
 
+
 def:pub CountdownApp() -> JsxElement {
     has analyzing: bool = False;
     has status: str = "Camera ready";
@@ -9,6 +10,10 @@ def:pub CountdownApp() -> JsxElement {
     has active_name: str = "No result yet";
     has active_confidence: str = "0%";
     has active_notes: str = "Start the webcam and capture a snapshot to identify a LEGO part.";
+    has active_part_id: str = "—";
+    has active_years: str = "Unknown";
+    has active_years_source: str = "BrickLink";
+    has active_bricklink_url: str = "";
     has provider: str = "Brickognize";
     has payload_text: str = "image/png · 0 bytes";
     has candidate_text: str = "0 matches returned";
@@ -116,9 +121,14 @@ def:pub CountdownApp() -> JsxElement {
             if result and result["success"] {
                 match_info = result["active_match"] or {};
                 telemetry = result["telemetry"] or {};
+                years_info = match_info["years_released"] or {};
                 active_name = str(match_info["name"] or "Unknown part");
                 active_confidence = str(match_info["confidence"] or "0%");
                 active_notes = str(match_info["notes"] or "Recognition complete.");
+                active_part_id = str(match_info["part_id"] or "—");
+                active_years = str(years_info["label"] or "Unknown");
+                active_years_source = str(years_info["source"] or "BrickLink");
+                active_bricklink_url = str(match_info["bricklink_url"] or "");
                 provider = str(telemetry["provider"] or "Brickognize");
                 payload_text = str(telemetry["mime_type"] or "image/png") + " · " + str(telemetry["bytes"] or 0) + " bytes";
                 candidate_text = str(telemetry["candidate_count"] or 0) + " matches returned";
@@ -173,7 +183,7 @@ def:pub CountdownApp() -> JsxElement {
                     <div className="rounded-full border border-border bg-muted px-3 py-1 text-sm text-muted-foreground">{permission}</div>
                 </div>
 
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition.</p>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition plus BrickLink release-year lookup.</p>
 
                 <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-black">
                     <div className="relative min-h-80 bg-neutral-950">
@@ -212,6 +222,22 @@ def:pub CountdownApp() -> JsxElement {
                             <span className="rounded-full bg-card px-3 py-1 text-sm font-medium text-foreground">{active_confidence}</span>
                         </div>
                         <p className="mt-3 text-sm leading-6 text-muted-foreground">{active_notes}</p>
+                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                            <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
+                                <p className="font-medium text-foreground">Part ID</p>
+                                <p className="mt-1">{active_part_id}</p>
+                            </div>
+                            <div className="rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground">
+                                <p className="font-medium text-foreground">Years released</p>
+                                <p className="mt-1">{active_years}</p>
+                                <p className="mt-1 text-xs">Source: {active_years_source}</p>
+                            </div>
+                        </div>
+                        {(active_bricklink_url != "") and (
+                            <a href={active_bricklink_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-card-hover">
+                                Open on BrickLink
+                            </a>
+                        )}
                     </div>
                 </div>
 
