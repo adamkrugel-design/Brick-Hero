@@ -51,9 +51,41 @@ def:pub CountdownApp() -> JsxElement {
 
             stream = None;
             try {
-                stream = await media_devices.getUserMedia({"video": {"width": {"ideal": 1280}, "height": {"ideal": 720}}, "audio": False});
+                stream = await media_devices.getUserMedia({"video": {"width": {"ideal": 1280}, "height": {"ideal": 720}, "facingMode": "user"}, "audio": False});
             } except Exception {
-                stream = await media_devices.getUserMedia({"video": True, "audio": False});
+                try {
+                    stream = await media_devices.getUserMedia({"video": True, "audio": False});
+                } except Exception {
+                    devices = await media_devices.enumerateDevices();
+                    selected_device_id = "";
+                    for device in devices {
+                        if device.kind == "videoinput" {
+                            selected_device_id = str(device.deviceId or "");
+                            if selected_device_id != "" {
+                                break;
+                            }
+                        }
+                    }
+                    if selected_device_id == "" {
+                        permission = "Unavailable";
+                        status = "No webcam device detected";
+                        return;
+                    }
+                    stream = await media_devices.getUserMedia({"video": {"deviceId": {"exact": selected_device_id}}, "audio": False});
+                }
+            }
+
+            if not stream {
+                permission = "Unavailable";
+                status = "Unable to create webcam stream";
+                return;
+            }
+
+            tracks = stream.getVideoTracks();
+            if not tracks or len(tracks) == 0 {
+                permission = "Unavailable";
+                status = "Webcam stream has no video track";
+                return;
             }
 
             video.srcObject = stream;
