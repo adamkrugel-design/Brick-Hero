@@ -89,8 +89,8 @@
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
-relative min-h-80 bg-neutral-950">
-  146 |                             <video id="scanner-video" className="h-full min-h-80 w-full object-cover" autoPlay={True} muted={True} playsInline={True}></video>
+[HMR] Reloaded: ./services/recognition.sv.jac
+                         <video id="scanner-video" className="h-full min-h-80 w-full object-cover" autoPlay={True} muted={True} playsInline={True}></video>
       |                                                                                                                     ^
   147 |                             {(permission != "Granted") and (
   148 |                                 <div className="absolute inset-0 flex items-center justify-center bg-black/60 px-6 text-center text-sm text-white/80">
@@ -253,9 +253,8 @@ relative min-h-80 bg-neutral-950">
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 [HMR] Reloaded: ./components/countdownApp.cl.jac
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
- | }
-  211 | 
-✖ Error: error[E0005]: Une[HMR] Reloaded: ./main.jac
+[HMR] Reloaded: ./services/recognition.sv.jac
+] Reloaded: ./main.jac
 ✔ Recompiled: ./main.jac -> main.js
 5:02:59 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
 [HMR] Reloaded: ./components/countdownApp.cl.jac
@@ -316,3 +315,4 @@ relative min-h-80 bg-neutral-950">
 ✔ Recompiled: ./components/countdownApp.cl.jac -> countdownApp.js
 6:07:26 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
 6:21:25 PM [vite] changed tsconfig file detected: /root/.jac-ide/projects/17b69293-e81d-4f4c-b993-82ce5edf7a27/prj_1775316932254/.jac/client/configs/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[HMR] Reloaded: ./services/recognition.sv.jac
