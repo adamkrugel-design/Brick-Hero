@@ -15,9 +15,9 @@ def:pub CountdownApp() -> JsxElement {
     has active_years_end: str = "";
     has active_years_source: str = "BrickLink";
     has active_release_range: str = "Unknown";
-    has active_color: str = "Unknown";
-    has active_color_source: str = "BrickLink";
-    has active_color_sample: str = "";
+    has active_known_colors: list = [];
+    has active_known_colors_label: str = "Unknown";
+    has active_known_colors_source: str = "BrickLink";
     has active_bricklink_url: str = "";
     has provider: str = "Brickognize";
     has payload_text: str = "image/png · 0 bytes";
@@ -29,6 +29,38 @@ def:pub CountdownApp() -> JsxElement {
 
     def get_canvas() -> any {
         return document.getElementById("scanner-canvas");
+    }
+
+    def normalize_known_colors(payload: any) -> list {
+        if payload == None {
+            return [];
+        }
+
+        if payload and payload.length != None {
+            normalized = [];
+            for item in payload {
+                color_name = str(item).strip();
+                if color_name != "" and color_name not in normalized {
+                    normalized = normalized + [color_name];
+                }
+            }
+            return normalized;
+        }
+
+        raw_text = str(payload).strip();
+        if raw_text == "" {
+            return [];
+        }
+
+        normalized_text = raw_text.replace(" / ", ",").replace("|", ",").replace(";", ",");
+        colors = [];
+        for piece in normalized_text.split(",") {
+            color_name = piece.strip();
+            if color_name != "" and color_name not in colors {
+                colors = colors + [color_name];
+            }
+        }
+        return colors;
     }
 
     def clear_stream() -> None {
@@ -127,7 +159,7 @@ def:pub CountdownApp() -> JsxElement {
                 match_info = result["active_match"] or {};
                 telemetry = result["telemetry"] or {};
                 years_info = (match_info and match_info["years_released"]) or {};
-                color_info = (match_info and match_info["color"]) or {};
+                known_colors_info = (match_info and match_info["known_colors"]) or {};
                 active_name = str((match_info and match_info["name"]) or "Unknown part");
                 active_confidence = str((match_info and match_info["confidence"]) or "0%");
                 active_notes = str((match_info and match_info["notes"]) or "Recognition complete.");
@@ -146,9 +178,9 @@ def:pub CountdownApp() -> JsxElement {
                     active_release_range = "Unknown";
                 }
                 active_years_source = str((years_info and years_info["source"]) or (match_info and match_info["years_released_source"]) or "BrickLink");
-                active_color = str((color_info and color_info["label"]) or (match_info and match_info["color_label"]) or (match_info and match_info["detected_color"]) or "Unknown");
-                active_color_source = str((color_info and color_info["source"]) or (match_info and match_info["color_source"]) or "BrickLink");
-                active_color_sample = str((color_info and color_info["rgb"]) or "");
+                active_known_colors = normalize_known_colors((known_colors_info and known_colors_info["items"]) or (known_colors_info and known_colors_info["label"]) or []);
+                active_known_colors_label = str(len(active_known_colors)) + " colors";
+                active_known_colors_source = str((known_colors_info and known_colors_info["source"]) or "BrickLink");
                 active_bricklink_url = str(match_info["bricklink_url"] or "");
                 provider = str(telemetry["provider"] or "Brickognize");
                 payload_text = str(telemetry["mime_type"] or "image/png") + " · " + str(telemetry["bytes"] or 0) + " bytes";
@@ -204,7 +236,7 @@ def:pub CountdownApp() -> JsxElement {
                     <div className="rounded-full border border-slate-600 bg-slate-900/80 px-3 py-1 text-sm font-medium text-slate-100">{permission}</div>
                 </div>
 
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition. After the piece is identified, BrickLink is used to look up the color and release-year details, with an image-based LEGO color fallback when BrickLink cannot provide a clean color label.</p>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition. After the piece is identified, BrickLink is used to look up the known color variants and release-year details for that part.</p>
 
                 <div className="mt-6 overflow-hidden rounded-2xl border border-slate-700 bg-black shadow-inner shadow-black/30">
                     <div className="relative min-h-80 bg-neutral-950">
@@ -238,19 +270,31 @@ def:pub CountdownApp() -> JsxElement {
                                 <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Detected part</p>
                                 <h3 className="mt-1 text-lg font-semibold text-white">{active_name}</h3>
                                 <div className="mt-3 flex flex-wrap gap-2">
-                                    <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-sm text-cyan-100">
-                                        <span className="text-[11px] font-medium uppercase tracking-wide text-cyan-200/80">Color</span>
-                                        <span className="font-semibold text-cyan-50">{str(active_color)}</span>
-                                    </div>
                                     <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-sm text-violet-100">
                                         <span className="text-[11px] font-medium uppercase tracking-wide text-violet-200/80">Years</span>
                                         <span className="font-semibold text-violet-50">{str(active_years)}</span>
                                     </div>
                                 </div>
                                 <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-400">
-                                    <p>Color source: <span className="font-medium text-slate-100">{active_color_source}</span></p>
-                                    {active_color_sample != "" and (<p>Sample RGB: <span className="font-medium text-slate-100">{active_color_sample}</span></p>)}
+                                    <p>Known colors source: <span className="font-medium text-slate-100">{active_known_colors_source}</span></p>
                                     <p>Years source: <span className="font-medium text-slate-100">{active_years_source}</span></p>
+                                </div>
+                                <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-4">
+                                    <div className="flex flex-wrap items-start justify-between gap-3">
+                                        <div>
+                                            <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">BrickLink known colors</p>
+                                            <p className="mt-1 text-sm text-slate-300">Available official color variants for this part.</p>
+                                        </div>
+                                        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-cyan-100">
+                                            <span>{str(len(active_known_colors))} listed</span>
+                                            <span className="h-1 w-1 rounded-full bg-cyan-200/70"></span>
+                                            <span>{str(active_known_colors_label)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 flex flex-wrap gap-2.5">
+                                        {len(active_known_colors) > 0 and ([<span key={color_name} className="inline-flex items-center rounded-full border border-cyan-300/30 bg-cyan-300/12 px-3.5 py-1.5 text-sm font-semibold text-cyan-50 shadow-sm shadow-cyan-950/20">{str(color_name)}</span> for color_name in active_known_colors])}
+                                        {len(active_known_colors) == 0 and (<div className="w-full rounded-xl border border-dashed border-slate-600 bg-slate-950/50 px-3 py-3 text-sm text-slate-300">No known colors were returned from BrickLink.</div>)}
+                                    </div>
                                 </div>
                             </div>
                             <span className="rounded-full border border-slate-600 bg-slate-900/90 px-3 py-1 text-sm font-semibold text-white">{active_confidence}</span>
@@ -280,7 +324,7 @@ def:pub CountdownApp() -> JsxElement {
                                 <div className="rounded-2xl bg-slate-950/70 p-4 text-sm text-slate-300">
                                     <p className="font-medium text-white">Recognition summary</p>
                                     <p className="mt-2">Confidence: <span className="font-semibold text-white">{active_confidence}</span></p>
-                                    <p className="mt-1">Color source: <span className="font-semibold text-white">{active_color_source}</span></p>
+                                    <p className="mt-1">Known colors source: <span className="font-semibold text-white">{active_known_colors_source}</span></p>
                                 </div>
                                 <div className="rounded-2xl bg-slate-950/70 p-4 text-sm text-slate-300">
                                     <p className="font-medium text-white">Catalog summary</p>
