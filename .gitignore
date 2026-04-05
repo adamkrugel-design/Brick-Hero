@@ -20,3 +20,4 @@ dist/
 .env
 .jac-preview.log
 .jac-ide-bashrc
+jac.toml

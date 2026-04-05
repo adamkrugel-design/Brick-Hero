@@ -1,4 +1,4 @@
-import from services.recognition { recognize_lego_frame }
+import from services.recognition { recognize_lego_frame, get_llm_color }
 
 cl import ".styles.global.css";
 cl import from .components.countdownApp { CountdownApp }

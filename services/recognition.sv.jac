@@ -1,6 +1,16 @@
 import from base64 { b64decode }
 import from requests { get, post }
+import from byllm.lib { Image }
 
+def llm_predict_color_from_list(img: Image, PotentialColors: list) -> str by llm();
+
+def:pub get_llm_color(frame_data: str, active_known_colors: list) -> str {
+    print("Predicting color with LLM...");
+    inImg = Image(frame_data);
+    llm_predict_color = llm_predict_color_from_list(inImg, active_known_colors);
+    print("LLM predicted color:", llm_predict_color);
+    return llm_predict_color;
+}
 
 def parse_data_url(frame_data: str) -> tuple[str, bytes] {
     if not frame_data {

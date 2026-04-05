@@ -1,4 +1,5 @@
-sv import from ..services.recognition { recognize_lego_frame }
+sv import from ..services.recognition { recognize_lego_frame, get_llm_color }
+sv import from byllm.lib { Image }
 
 def:pub CountdownApp() -> JsxElement {
     has analyzing: bool = False;
@@ -22,6 +23,7 @@ def:pub CountdownApp() -> JsxElement {
     has provider: str = "Brickognize";
     has payload_text: str = "image/png · 0 bytes";
     has candidate_text: str = "0 matches returned";
+    has llm_predict_color: str = "Unknown";
 
     def get_video() -> any {
         return document.getElementById("scanner-video");
@@ -184,6 +186,7 @@ def:pub CountdownApp() -> JsxElement {
                 provider = str(telemetry["provider"] or "Brickognize");
                 payload_text = str(telemetry["mime_type"] or "image/png") + " · " + str(telemetry["bytes"] or 0) + " bytes";
                 candidate_text = str(telemetry["candidate_count"] or 0) + " matches returned";
+                llm_predict_color = "Unknown";
                 status = "Analysis complete";
             } else {
                 status = str((result and result["error"]) or "Recognition failed");
@@ -222,6 +225,7 @@ def:pub CountdownApp() -> JsxElement {
         frame_data = canvas.toDataURL("image/png");
         captured_frame = frame_data;
         await analyze_frame(frame_data);
+        llm_predict_color = await get_llm_color(frame_data, active_known_colors);
     }
 
     return (
@@ -279,6 +283,11 @@ def:pub CountdownApp() -> JsxElement {
                                         <span className="text-[11px] font-medium uppercase tracking-wide text-violet-200/80">Years</span>
                                         <span className="font-semibold text-violet-50">{str(active_years)}</span>
                                     </div>
+                                    <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-sm text-violet-100">
+                                        <span className="text-[11px] font-medium uppercase tracking-wide text-violet-200/80">Color Estimate:</span>
+                                        <span className="font-semibold text-violet-50"> {llm_predict_color}</span>
+                                    </div>
+                                    
                                 </div>
                                 <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-400">
                                 </div>
