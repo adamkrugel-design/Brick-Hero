@@ -7,7 +7,7 @@ def:pub CountdownApp() -> JsxElement {
     has camera_active: bool = False;
     has captured_frame: str = "";
     has active_name: str = "No result yet";
-    has active_confidence: str = "0%";
+    has active_confidence: str = "";
     has active_notes: str = "Start the webcam and capture a snapshot to identify a LEGO part.";
     has active_part_id: str = "—";
     has active_years: str = "Unknown";
@@ -161,7 +161,7 @@ def:pub CountdownApp() -> JsxElement {
                 years_info = (match_info and match_info["years_released"]) or {};
                 known_colors_info = (match_info and match_info["known_colors"]) or {};
                 active_name = str((match_info and match_info["name"]) or "Unknown part");
-                active_confidence = str((match_info and match_info["confidence"]) or "0%");
+                active_confidence = str((match_info and match_info["confidence"]) or "");
                 active_notes = str((match_info and match_info["notes"]) or "Recognition complete.");
                 active_part_id = str((match_info and match_info["specific_part_number"]) or (match_info and match_info["part_id"]) or "—");
                 years_label = (years_info and years_info["label"]) or (match_info and match_info["years_released_label"]) or "Unknown";
@@ -179,7 +179,6 @@ def:pub CountdownApp() -> JsxElement {
                 }
                 active_years_source = str((years_info and years_info["source"]) or (match_info and match_info["years_released_source"]) or "BrickLink");
                 active_known_colors = normalize_known_colors((known_colors_info and known_colors_info["items"]) or (known_colors_info and known_colors_info["label"]) or []);
-                active_known_colors_label = str(len(active_known_colors)) + " colors";
                 active_known_colors_source = str((known_colors_info and known_colors_info["source"]) or "BrickLink");
                 active_bricklink_url = str(match_info["bricklink_url"] or "");
                 provider = str(telemetry["provider"] or "Brickognize");
@@ -264,10 +263,16 @@ def:pub CountdownApp() -> JsxElement {
                 <div className="rounded-3xl border border-border/90 bg-card/95 p-6 shadow-soft backdrop-blur">
                     <p className="text-sm font-medium tracking-wide text-sky-200">Result</p>
                     <h2 className="mt-1 text-2xl font-semibold text-white">Top match</h2>
-                    <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
+                    <div className="grid w-full mt-4 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
                         <div className="flex items-start justify-between gap-3">
                             <div>
-                                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Detected part</p>
+                                <p className="grid w-full grid-cols-[1fr_auto] items-center text-xs uppercase tracking-[0.2em] text-slate-400">
+                                    <span>Detected part</span>
+                                    {active_confidence and (<span className="rounded-full border border-slate-600 bg-slate-900/90 px-3 py-1 text-sm font-semibold normal-case tracking-normal text-white">
+                                        {active_confidence}
+                                    </span>)}
+                                </p>
+                                
                                 <h3 className="mt-1 text-lg font-semibold text-white">{active_name}</h3>
                                 <div className="mt-3 flex flex-wrap gap-2">
                                     <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-sm text-violet-100">
@@ -276,10 +281,8 @@ def:pub CountdownApp() -> JsxElement {
                                     </div>
                                 </div>
                                 <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-400">
-                                    <p>Known colors source: <span className="font-medium text-slate-100">{active_known_colors_source}</span></p>
-                                    <p>Years source: <span className="font-medium text-slate-100">{active_years_source}</span></p>
                                 </div>
-                                <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-4">
+                                {len(active_known_colors) > 0 and (<div className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-4">
                                     <div className="flex flex-wrap items-start justify-between gap-3">
                                         <div>
                                             <p className="text-xs uppercase tracking-[0.2em] text-cyan-200/80">BrickLink known colors</p>
@@ -288,17 +291,17 @@ def:pub CountdownApp() -> JsxElement {
                                         <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-cyan-100">
                                             <span>{str(len(active_known_colors))} listed</span>
                                             <span className="h-1 w-1 rounded-full bg-cyan-200/70"></span>
-                                            <span>{str(active_known_colors_label)}</span>
                                         </div>
                                     </div>
                                     <div className="mt-4 flex flex-wrap gap-2.5">
                                         {len(active_known_colors) > 0 and ([<span key={color_name} className="inline-flex items-center rounded-full border border-cyan-300/30 bg-cyan-300/12 px-3.5 py-1.5 text-sm font-semibold text-cyan-50 shadow-sm shadow-cyan-950/20">{str(color_name)}</span> for color_name in active_known_colors])}
                                         {len(active_known_colors) == 0 and (<div className="w-full rounded-xl border border-dashed border-slate-600 bg-slate-950/50 px-3 py-3 text-sm text-slate-300">No known colors were returned from BrickLink.</div>)}
                                     </div>
-                                </div>
+                                </div>)}
                             </div>
-                            <span className="rounded-full border border-slate-600 bg-slate-900/90 px-3 py-1 text-sm font-semibold text-white">{active_confidence}</span>
+                            
                         </div>
+                        
                         <p className="mt-3 text-sm leading-6 text-slate-300">{active_notes}</p>
                         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
                             <div className="rounded-2xl border border-slate-700 bg-slate-900/80 p-4 text-sm text-slate-300">
