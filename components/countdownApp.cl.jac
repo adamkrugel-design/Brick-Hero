@@ -234,12 +234,10 @@ def:pub CountdownApp() -> JsxElement {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <p className="text-sm font-medium tracking-wide text-sky-200">LEGO recognition</p>
-                        <h1 className="mt-1 text-3xl font-semibold text-white sm:text-4xl">Minimal scanner</h1>
+                        <h1 className="mt-1 text-3xl font-semibold text-white sm:text-4xl">Brick Hero</h1>
                     </div>
                     <div className="rounded-full border border-slate-600 bg-slate-900/80 px-3 py-1 text-sm font-medium text-slate-100">{permission}</div>
                 </div>
-
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">Use the webcam, capture a snapshot, and send the image to Brickognize for part recognition. After the piece is identified, BrickLink is used to look up the known color variants and release-year details for that part.</p>
 
                 <div className="mt-6 overflow-hidden rounded-2xl border border-slate-700 bg-black shadow-inner shadow-black/30">
                     <div className="relative min-h-80 bg-neutral-950">
@@ -299,8 +297,14 @@ def:pub CountdownApp() -> JsxElement {
                                         </div>
                                         <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-cyan-100">
                                             <span>{str(len(active_known_colors))} listed</span>
-                                            <span className="h-1 w-1 rounded-full bg-cyan-200/70"></span>
                                         </div>
+                                        {active_bricklink_url != "" and (
+                                        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-slate-950/60 px-3 py-1.5 text-xs font-semibold text-cyan-100">
+                                            <span><a href={active_bricklink_url} target="_blank" rel="noreferrer">
+                                            Open on BrickLink
+                                            </a></span>
+                                        </div>)}
+                                        
                                     </div>
                                     <div className="mt-4 flex flex-wrap gap-2.5">
                                         {len(active_known_colors) > 0 and ([<span key={color_name} className="inline-flex items-center rounded-full border border-cyan-300/30 bg-cyan-300/12 px-3.5 py-1.5 text-sm font-semibold text-cyan-50 shadow-sm shadow-cyan-950/20">{str(color_name)}</span> for color_name in active_known_colors])}
@@ -324,30 +328,7 @@ def:pub CountdownApp() -> JsxElement {
                                 <p className="mt-1 text-xs text-slate-400">Start and end years</p>
                             </div>
                         </div>
-                        <div className="mt-4 rounded-2xl border border-slate-700 bg-slate-900/80 p-4">
-                            <div className="flex flex-wrap items-center justify-between gap-3">
-                                <div>
-                                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Detection details</p>
-                                    <p className="mt-1 text-sm text-slate-300">Recognition provider, release metadata, and catalog lookup for the detected LEGO part.</p>
-                                </div>
-                                <span className="rounded-full border border-slate-600 bg-slate-950/80 px-3 py-1 text-xs font-medium text-slate-100">{provider}</span>
-                            </div>
-                            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                                <div className="rounded-2xl bg-slate-950/70 p-4 text-sm text-slate-300">
-                                    <p className="font-medium text-white">Recognition summary</p>
-                                    <p className="mt-2">Confidence: <span className="font-semibold text-white">{active_confidence}</span></p>
-                                    <p className="mt-1">Known colors source: <span className="font-semibold text-white">{active_known_colors_source}</span></p>
-                                </div>
-                                <div className="rounded-2xl bg-slate-950/70 p-4 text-sm text-slate-300">
-                                    <p className="font-medium text-white">Catalog summary</p>
-                                    <p className="mt-2">Years source: <span className="font-semibold text-white">{active_years_source}</span></p>
-                                    <p className="mt-1">BrickLink lookup: <span className="font-semibold text-white">{active_bricklink_url != "" and "Available" or "Unavailable"}</span></p>
-                                </div>
-                            </div>
-                            {active_bricklink_url != "" and (<a href={active_bricklink_url} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-xl border border-slate-600 bg-slate-950/80 px-4 py-2 text-sm font-medium text-slate-100 transition hover:bg-slate-800">
-                                Open on BrickLink
-                            </a>)}
-                        </div>
+                        
                     </div>
                 </div>
 

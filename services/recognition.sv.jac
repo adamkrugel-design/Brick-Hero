@@ -3,12 +3,17 @@ import from requests { get, post }
 import from byllm.lib { Image }
 
 def llm_predict_color_from_list(img: Image, PotentialColors: list) -> str by llm();
+sem llm_predict_color_from_list = "Select the single, best matching color from the Potential Colors list for the LEGO piece in the image and return."
 
 def:pub get_llm_color(frame_data: str, active_known_colors: list) -> str {
-    print("Predicting color with LLM...");
+    print("Predicting color with LLM from list of potential colors:", active_known_colors);
     inImg = Image(frame_data);
     llm_predict_color = llm_predict_color_from_list(inImg, active_known_colors);
     print("LLM predicted color:", llm_predict_color);
+    if(llm_predict_color not in active_known_colors) {
+        print(f"LLM predicted color is not in the list {active_known_colors} of active known colors. Ignoring LLM prediction.");
+        return "Unknown";
+    }
     return llm_predict_color;
 }
 
